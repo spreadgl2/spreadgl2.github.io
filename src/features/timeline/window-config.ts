@@ -1,0 +1,1 @@
+export const DEFAULT_WINDOW_FRACTION = 0.05;

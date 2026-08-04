@@ -1,0 +1,30 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "enables the default permissions",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "fs:allow-open",
+    "fs:allow-read",
+    "fs:allow-fstat",
+    "fs:allow-write-text-file",
+    "store:allow-load",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-save",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://github.com/*" },
+        { "url": "https://beast.community/*" },
+        { "url": "https://doi.org/*" },
+        { "url": "https://deck.gl/*" }
+      ]
+    }
+  ]
+}

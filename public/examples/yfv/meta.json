@@ -1,0 +1,13 @@
+{
+  "id": "yfv",
+  "label": "Yellow Fever virus in Brazil",
+  "tipCount": 705,
+  "traitName": "location1/location2",
+  "dateSpan": [
+    2015.6247,
+    2019.2877
+  ],
+  "blurb": "Continuous phylogeography of Yellow Fever virus across Brazilian states (Faria et al.). Multi-modal HPD polygons; secondary traits ecoregion and host_type drive Style panel color/glyph.",
+  "treePath": "examples/yfv/tree.nex",
+  "boundariesPath": "examples/_shared/world-countries.geojson"
+}

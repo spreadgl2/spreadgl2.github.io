@@ -1,0 +1,100 @@
+{
+  "maxX": 1.9,
+  "maxY": 5,
+  "xAxisMode": "divergence",
+  "nodes": [
+    {
+      "id": "n0",
+      "x": 0,
+      "y": 3.375,
+      "isTip": false,
+      "parentId": null,
+      "children": [
+        "n1",
+        "n6"
+      ],
+      "isCollapsed": false
+    },
+    {
+      "id": "n1",
+      "x": 0.6,
+      "y": 2.25,
+      "isTip": false,
+      "parentId": "n0",
+      "children": [
+        "n2",
+        "n5"
+      ],
+      "isCollapsed": false
+    },
+    {
+      "id": "n2",
+      "x": 1.4,
+      "y": 1.5,
+      "isTip": false,
+      "parentId": "n1",
+      "children": [
+        "n3",
+        "n4"
+      ],
+      "isCollapsed": false
+    },
+    {
+      "id": "n3",
+      "x": 1.9,
+      "y": 1,
+      "isTip": true,
+      "parentId": "n2",
+      "children": [],
+      "isCollapsed": false
+    },
+    {
+      "id": "n4",
+      "x": 1.9,
+      "y": 2,
+      "isTip": true,
+      "parentId": "n2",
+      "children": [],
+      "isCollapsed": false
+    },
+    {
+      "id": "n5",
+      "x": 1.9,
+      "y": 3,
+      "isTip": true,
+      "parentId": "n1",
+      "children": [],
+      "isCollapsed": false
+    },
+    {
+      "id": "n6",
+      "x": 0.9,
+      "y": 4.5,
+      "isTip": false,
+      "parentId": "n0",
+      "children": [
+        "n7",
+        "n8"
+      ],
+      "isCollapsed": false
+    },
+    {
+      "id": "n7",
+      "x": 1.9,
+      "y": 4,
+      "isTip": true,
+      "parentId": "n6",
+      "children": [],
+      "isCollapsed": false
+    },
+    {
+      "id": "n8",
+      "x": 1.9,
+      "y": 5,
+      "isTip": true,
+      "parentId": "n6",
+      "children": [],
+      "isCollapsed": false
+    }
+  ]
+}

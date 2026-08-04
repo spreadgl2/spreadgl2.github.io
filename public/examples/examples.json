@@ -1,0 +1,45 @@
+{
+  "examples": [
+    {
+      "id": "pedv",
+      "label": "PEDV in China",
+      "tipCount": 769,
+      "traitName": "location",
+      "traitKind": "discrete",
+      "dateSpan": [
+        2010,
+        2018
+      ],
+      "blurb": "Discrete phylogeography of porcine epidemic diarrhea virus across Chinese provinces, with BSSVS multi-state ancestors.",
+      "treePath": "examples/pedv/tree.nex",
+      "locationsPath": "examples/pedv/locations.csv",
+      "boundariesPath": "examples/pedv/boundaries.geojson",
+      "environmentPath": "examples/pedv/environment.csv"
+    },
+    {
+      "id": "yfv",
+      "label": "Yellow Fever virus in Brazil",
+      "tipCount": 705,
+      "traitName": "location1/location2",
+      "dateSpan": [
+        2015.6247,
+        2019.2877
+      ],
+      "blurb": "Continuous phylogeography of Yellow Fever virus across Brazilian states (Faria et al.). Multi-modal HPD polygons; secondary traits ecoregion and host_type drive Style panel color/glyph.",
+      "treePath": "examples/yfv/tree.nex",
+      "boundariesPath": "examples/_shared/world-countries.geojson"
+    },
+    {
+      "id": "b117",
+      "label": "SARS-CoV-2 B.1.1.7 (Alpha) in the UK",
+      "tipCount": 17716,
+      "traitName": "location1/location2",
+      "dateSpan": [
+        2020.68,
+        2021.03
+      ],
+      "blurb": "Continuous phylogeography of SARS-CoV-2 Alpha lineage across the UK (reprojected EPSG:27700 → WGS84). ~17k tips — the v1.0 performance ceiling fixture.",
+      "treePath": "examples/b117/tree.nex"
+    }
+  ]
+}

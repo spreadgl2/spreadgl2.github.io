@@ -1,0 +1,5 @@
+#NEXUS
+
+begin trees;
+	tree TREE1 = [&R] ((TipA|2010-05-12[&coordinates1=530200.5,coordinates2=179800.3]:0.5,TipB|2011-03-08[&coordinates1=385600.2,coordinates2=394300.7]:0.5)[&coordinates1=458400.3,coordinates2=287100.5]:0.8,TipC|2012-07-22[&coordinates1=625800.1,coordinates2=313200.4]:1.3)[&coordinates1=512000.6,coordinates2=291500.2];
+end;

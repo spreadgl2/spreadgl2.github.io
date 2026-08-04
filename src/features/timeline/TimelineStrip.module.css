@@ -1,0 +1,280 @@
+@import "../../styles/tokens.css";
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 56px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 var(--space-3);
+  gap: 2px;
+  box-sizing: border-box;
+  user-select: none;
+  /* Clips the window band where it runs past the strip edge — the band may
+     extend left into t<0, riding the separator over the transport buttons. */
+  overflow: hidden;
+}
+
+.empty {
+  flex: 1;
+}
+
+.row1 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-height: 0;
+}
+
+.row2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Transport */
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.transportBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--fg-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.transportBtn:hover {
+  background: var(--bg-elevated);
+  color: var(--fg-primary);
+}
+
+.transportBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Play/Pause is the primary control — larger, accent-tinted. */
+.playBtn {
+  width: 34px;
+  height: 34px;
+  color: var(--accent);
+  background: var(--accent-translucent);
+}
+
+.playBtn:hover {
+  color: var(--accent-hover);
+  background: var(--accent-translucent);
+}
+
+/* Track */
+
+/* Wraps the scrubber track and fills the row height, so the window band can
+   ride the strip's top separator while staying horizontally aligned to the
+   track (the track is its only in-flow child, so they share a width). */
+.sliderArea {
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  background: var(--border-default);
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: center;
+  overflow: visible;
+}
+
+/* The window band rides the separator line at the top of the timeline strip —
+   time-aligned to the track but clear of the track, dot, and transport
+   buttons, and pointer-transparent. */
+.windowRegion {
+  position: absolute;
+  top: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Drag handle at the window band's left edge — resizes the window. The 14px
+   box is the hit area; ::before is the visible grip hanging from the band. */
+.windowHandle {
+  position: absolute;
+  top: 0;
+  width: 14px;
+  height: 9px;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+}
+
+.windowHandle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 8px;
+  transform: translateX(-50%);
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.windowStartTooltip {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translate(-50%, -4px);
+  padding: 2px 6px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.windowHandle:hover .windowStartTooltip,
+.windowHandle:focus .windowStartTooltip {
+  opacity: 1;
+}
+
+.scrubberDot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: grab;
+  transition: transform var(--dur-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+.scrubberDot:active {
+  cursor: grabbing;
+}
+
+/* Speed */
+
+.speedSelect {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--fg-secondary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  padding: 1px 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Mode pills */
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.modePills {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.toggles {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Separates playback modes (Trail/Window) from rendering modifiers (Arcs/Clade). */
+.modeDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+.modePill {
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--fg-tertiary);
+  font-size: var(--text-md);
+  padding: 1px 6px;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.modePillActive {
+  background: var(--accent-translucent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.modePillFlash {
+  background: var(--accent);
+  color: var(--fg-inverse);
+  border-color: var(--accent);
+}
+
+.modePillDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.modePill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.speedSelect:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Playhead readout */
+
+.readout {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+  letter-spacing: 0.04em;
+}

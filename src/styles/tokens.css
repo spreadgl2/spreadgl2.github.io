@@ -1,0 +1,207 @@
+/* Atkinson Hyperlegible — Braille Institute's accessibility-focused family
+   (https://www.brailleinstitute.org/freefont/), bundled locally so the app
+   renders consistently offline, including in the Tauri build. Both faces are
+   variable (weight 200–800); licence in assets/fonts/OFL.txt (OFL-1.1). */
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("../assets/fonts/atkinson-hyperlegible-next-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("../assets/fonts/atkinson-hyperlegible-mono-latin.woff2") format("woff2");
+}
+
+/* Global reset — the app fills the viewport exactly; no scrollbars. */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* DESIGN §7 — 2 px accent outline at 2 px offset, always visible on keyboard nav. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:root {
+  /* Typography — see DESIGN §5.1. Atkinson Hyperlegible (bundled) with a
+     system fallback chain, plus a small readable scale for a dense tool. */
+  --font-sans: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+
+  --text-micro: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+  --text-title: 16px;
+  --text-xl: 18px;
+  --text-2xl: 20px;
+
+  --line-tight: 1.2;
+  --line-ui: 1.35;
+  --line-body: 1.45;
+
+  /* Surfaces */
+  --bg-base: #0a0b0d;
+  --bg-surface: #14161a;
+  --bg-elevated: #1c1f24;
+  --bg-overlay: rgba(10, 11, 13, 0.7);
+
+  /* Borders */
+  --border-subtle: #21262c;
+  --border-default: #2a3138;
+
+  /* Foreground */
+  --fg-primary: #e8eaee;
+  --fg-secondary: #989ea7;
+  --fg-tertiary: #5d6470;
+  --fg-inverse: #0a0b0d;
+
+  /* Accent */
+  --accent: #7ce3cb;
+  --accent-hover: #8feedd;
+  --accent-translucent: rgba(124, 227, 203, 0.16);
+
+  /* Branch / tree palette */
+  --branch-muted: #313842;
+  --branch-active: #d2d7df;
+  --tip-default: #d2d7df;
+  --tip-low-post: transparent;
+
+  /* Boundary overlays — muted steel blue, distinct from the warm Okabe-Ito /
+     viridis branch colors. Alpha 0.85 + 2-px stroke in deck.gl so the outline
+     reads clearly on the dark basemap at any zoom. */
+  --boundary: rgba(118, 144, 174, 0.85);
+
+  /* Status */
+  --error: #f08c8c;
+  --warning: #f0c66a;
+  --success: #7ce3cb;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 400ms;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Responsive layout dimensions — adjusted by media queries below */
+  --sidebar-width: 240px;
+  --drawer-width: 320px;
+}
+
+[data-reduced-motion="true"] {
+  --dur-fast: 0ms;
+  --dur-base: 0ms;
+  --dur-slow: 0ms;
+}
+
+html[data-reduced-motion="true"] {
+  scroll-behavior: auto;
+}
+
+[data-reduced-motion="true"] body *,
+[data-reduced-motion="true"] body *::before,
+[data-reduced-motion="true"] body *::after {
+  transition-duration: 0ms;
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+}
+
+@media (max-width: 1279px) and (min-width: 1024px) {
+  :root {
+    --sidebar-width: 48px;
+    --drawer-width: 280px;
+  }
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --sidebar-width: 48px;
+    --drawer-width: 280px;
+  }
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+[data-theme="light"] {
+  /* Solarized Light palette: warm beige surfaces instead of stark white. */
+  --bg-base: #fdf6e3;
+  --bg-surface: #eee8d5;
+  --bg-elevated: #eee8d5;
+  --bg-overlay: rgba(0, 43, 54, 0.5);
+  --border-subtle: #93a1a1;
+  --border-default: #839496;
+  /* Darker text for WCAG AA legibility on beige. */
+  --fg-primary: #073642;
+  --fg-secondary: #33454c;
+  /* #47595f: darkened from Solarized base01 (#586e75) to clear 4.5:1 on
+     both --bg-base and --bg-surface (was 4.39:1 on surface, now 5.99:1). */
+  --fg-tertiary: #47595f;
+  /* Deep teal accent darkened to #126f61 so it clears 4.5:1 on --bg-surface
+     (was 3.99:1 at #157f6f; now 4.94:1). Hover likewise shifted to #147267. */
+  --accent: #126f61;
+  --accent-hover: #147267;
+  --accent-translucent: rgba(18, 111, 97, 0.16);
+  --branch-muted: #93a1a1;
+  --branch-active: #073642;
+  --tip-default: #073642;
+  /* Error/warning overrides: the dark-theme reds/yellows (#f08c8c / #f0c66a)
+     are too light on Solarized beige (2.20:1 / 1.50:1). Replace with deep-red /
+     amber that pass 4.5:1 on both --bg-base and --bg-surface. */
+  --error: #b91c1c;
+  --warning: #7a5200;
+  --success: #126f61;
+  /* Light-theme boundary: steel blue from Solarized base01, reads clearly on
+     the warm Voyager basemap. */
+  --boundary: rgba(45, 65, 90, 0.8);
+}

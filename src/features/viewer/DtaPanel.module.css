@@ -1,0 +1,326 @@
+@import "../../styles/tokens.css";
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Map overlay, Trait, Model, and BF threshold sit side by side above the table. */
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4) var(--space-8);
+  margin-bottom: var(--space-5);
+}
+
+.select,
+.thresholdInput {
+  height: 26px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+}
+
+.thresholdInput {
+  width: 72px;
+}
+
+/* Map-overlay radios with the BF legend to their right. */
+.overlayRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--fg-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.value {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-primary);
+}
+
+.hint {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--fg-tertiary);
+}
+
+.toggleRow {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--fg-secondary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.toggleBtn:hover {
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+}
+
+.toggleBtnActive {
+  background: var(--accent-translucent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+  color: var(--fg-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkLabel span {
+  color: var(--fg-primary);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+}
+
+.table thead tr {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table th {
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  color: var(--fg-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.thBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--fg-secondary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.thBtn:hover {
+  color: var(--fg-primary);
+}
+
+.thEvidence {
+  text-align: center;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-elevated);
+}
+
+.table td {
+  padding: var(--space-1) var(--space-2);
+  color: var(--fg-primary);
+}
+
+.stateCell {
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.numCell {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  text-align: right;
+  color: var(--fg-primary);
+}
+
+.evidenceChip {
+  display: inline-block;
+  padding: 1px var(--space-1);
+  border-radius: 3px;
+  font-size: var(--text-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.chip-very-strong {
+  background: rgba(124, 227, 203, 0.25);
+  color: var(--accent);
+}
+
+.chip-strong {
+  background: rgba(124, 227, 203, 0.12);
+  color: var(--accent);
+}
+
+.chip-positive {
+  background: rgba(240, 198, 106, 0.15);
+  color: var(--warning);
+}
+
+.chip-weak {
+  background: rgba(240, 198, 106, 0.08);
+  color: var(--warning);
+}
+
+.chip-no-support {
+  background: var(--bg-elevated);
+  color: var(--fg-tertiary);
+}
+
+.emptyRow {
+  text-align: center;
+  color: var(--fg-tertiary);
+  font-style: italic;
+  padding: var(--space-4);
+}
+
+.empty {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-tertiary);
+  font-style: italic;
+}
+
+.footnote {
+  font-family: var(--font-sans);
+  font-size: var(--text-micro);
+  color: var(--fg-tertiary);
+  line-height: 1.5;
+}
+
+.tabRow {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--fg-secondary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+  text-align: center;
+}
+
+.tab:hover {
+  color: var(--fg-primary);
+}
+
+.tabActive {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.radioRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+  color: var(--fg-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.radioLabel span {
+  color: var(--fg-primary);
+}
+
+.thHeatmap {
+  text-align: center;
+  width: 64px;
+  min-width: 64px;
+}
+
+.heatCell {
+  padding: var(--space-1) var(--space-2);
+  width: 64px;
+  min-width: 64px;
+  vertical-align: middle;
+}
+
+.heatBar {
+  height: 8px;
+  background: var(--accent);
+  border-radius: 2px;
+  min-width: 2px;
+  opacity: 0.7;
+  transition: width var(--dur-fast) var(--ease-out);
+}

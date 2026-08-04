@@ -1,0 +1,149 @@
+@import "../../styles/tokens.css";
+
+.contentRow {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  position: relative;
+}
+
+.treePanel {
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.splitter {
+  width: 4px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--border-default);
+  border: none;
+  padding: 0;
+  display: block;
+  height: 100%;
+  z-index: 4;
+}
+
+.splitter:hover {
+  background: var(--fg-tertiary);
+}
+
+.mapPanel {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.deckSurface {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.treeOverlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  z-index: 4;
+  pointer-events: auto;
+}
+
+.treeSortToolbar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  gap: 4px;
+  background: var(--surface-base, rgba(0, 0, 0, 0.4));
+  padding: 4px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+  transition: opacity 0.4s var(--ease-out);
+}
+
+.mapOverlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.mapOverlay > * {
+  pointer-events: auto;
+}
+
+.noGeoNotice {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 24px;
+}
+
+.noGeoNoticeInner {
+  max-width: 360px;
+  background: rgba(20, 22, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-family: var(--font-sans);
+  color: var(--fg-secondary, #c8ccd2);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
+
+.noGeoNoticeTitle {
+  font-weight: 600;
+  color: #e8eaee;
+  margin-bottom: 6px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+.pickLocationBanner {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: rgba(20, 22, 26, 0.92);
+  color: var(--fg-primary, #e8eaee);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  pointer-events: none;
+}
+
+.clusterTooltip {
+  position: fixed;
+  background: rgba(20, 22, 26, 0.92);
+  color: #e8eaee;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  pointer-events: none;
+  z-index: 10;
+}

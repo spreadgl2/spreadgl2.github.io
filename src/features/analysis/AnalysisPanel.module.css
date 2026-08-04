@@ -1,0 +1,294 @@
+@import "../../styles/tokens.css";
+
+.panel {
+  --jump-intro-color: #64d7c1;
+  --jump-export-color: #ff8a6c;
+
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  overflow: hidden;
+}
+
+:global([data-theme="light"]) .panel {
+  --jump-intro-color: #126f61;
+  --jump-export-color: #b63f2f;
+}
+
+.fill {
+  flex: 1;
+  min-height: 0;
+}
+
+.tab {
+  height: 24px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--fg-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.tabActive {
+  border-color: var(--accent);
+  background: var(--accent-translucent);
+  color: var(--accent);
+}
+
+.plotWrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-2) 0;
+}
+
+/* BSSVS tab body: fills the plot area and scrolls independently. The right
+   padding keeps the table clear of the floating edge tabs (min-width 64px +
+   offset) that sit above the top-right corner. */
+.bssvsPane {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  padding: var(--space-2) 84px var(--space-2) var(--space-3);
+}
+
+.edgeTabs {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-2);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+}
+
+.edgeTab {
+  min-width: 64px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 24%);
+}
+
+.plot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.axis {
+  stroke: var(--border-default);
+  stroke-width: 1;
+}
+
+.grid {
+  stroke: var(--border-subtle);
+  stroke-width: 1;
+  opacity: 0.65;
+}
+
+.tickText {
+  fill: var(--fg-secondary);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+}
+
+:global([data-theme="light"]) .grid {
+  stroke: rgb(131 148 150 / 28%);
+  opacity: 1;
+}
+
+.series {
+  fill: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.seriesDim {
+  opacity: 0.22;
+  filter: saturate(0.35);
+}
+
+.seriesActive {
+  opacity: 1;
+  filter: saturate(1.25);
+}
+
+.playheadMarker {
+  pointer-events: all;
+}
+
+.playheadHitArea {
+  stroke: transparent;
+  stroke-width: 12;
+  vector-effect: non-scaling-stroke;
+  cursor: default;
+}
+
+.playheadLine {
+  stroke: var(--fg-primary);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.7;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.transitionStats {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  right: 112px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 22px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.transitionMetric {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  color: var(--fg-primary);
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+
+.metricLabel {
+  color: var(--fg-secondary);
+  white-space: nowrap;
+}
+
+.metricValue {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.transitionNote {
+  min-width: 0;
+  color: var(--fg-tertiary);
+  font-size: var(--text-xs);
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transitionBar {
+  fill: var(--accent);
+  vector-effect: non-scaling-stroke;
+}
+
+.transitionBarInteractive {
+  cursor: pointer;
+}
+
+.transitionIntroBar {
+  fill: var(--jump-intro-color);
+  stroke: rgb(255 255 255 / 20%);
+  stroke-width: 0.5;
+}
+
+.transitionExportBar {
+  fill: var(--jump-export-color);
+  stroke: rgb(255 255 255 / 16%);
+  stroke-width: 0.5;
+}
+
+.transitionBarDim {
+  opacity: 0.2;
+  filter: saturate(0.55);
+}
+
+.transitionBarActive {
+  opacity: 0.88;
+  filter: saturate(1.18);
+}
+
+.transitionBarUnselected {
+  opacity: 0.12;
+  filter: saturate(0.35);
+}
+
+.transitionBarSelected {
+  opacity: 1;
+  stroke: var(--fg-primary);
+  stroke-width: 1.5;
+  filter: saturate(1.3);
+}
+
+.emptyState {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 1;
+  max-width: calc(100% - 260px);
+  color: var(--fg-tertiary);
+  font-size: var(--text-sm);
+  pointer-events: none;
+}
+
+.transitionBreakdown {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 1;
+  display: flex;
+  max-width: min(52%, 560px);
+  gap: var(--space-1);
+  pointer-events: none;
+}
+
+.routePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 180px;
+  color: var(--fg-secondary);
+  font-size: var(--text-xs);
+  line-height: 1;
+}
+
+.routeSwatch {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 20%);
+}
+
+.routeLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routeValue {
+  color: var(--fg-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .transitionStats {
+    right: 104px;
+    gap: var(--space-1);
+  }
+
+  .transitionNote,
+  .transitionBreakdown {
+    display: none;
+  }
+}

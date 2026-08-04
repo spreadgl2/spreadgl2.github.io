@@ -1,0 +1,92 @@
+@import "../../styles/tokens.css";
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: max(var(--space-4), env(safe-area-inset-top))
+    max(var(--space-4), env(safe-area-inset-right)) max(var(--space-4), env(safe-area-inset-bottom))
+    max(var(--space-4), env(safe-area-inset-left));
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(520px, 100%);
+  max-height: calc(100dvh - var(--space-8));
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-6);
+  color: var(--fg-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.notice {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  color: var(--fg-primary);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 55%, transparent);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.notice strong {
+  font-weight: 600;
+}
+
+.notice p {
+  margin: var(--space-1) 0 0;
+  color: var(--fg-secondary);
+}
+
+.icon {
+  margin-top: 1px;
+  color: var(--warning);
+}
+
+.detail {
+  margin: 0;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.continueBtn {
+  align-self: flex-end;
+  padding: var(--space-2) var(--space-4);
+  color: var(--fg-inverse);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.continueBtn:hover {
+  background: var(--accent-hover);
+}

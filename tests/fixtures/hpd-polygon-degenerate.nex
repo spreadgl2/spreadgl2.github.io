@@ -1,0 +1,5 @@
+#NEXUS
+
+begin trees;
+	tree TREE1 = [&R] ((TipA|2010-01-01[&location1=39.0,location2=-90.0]:1.0,TipB|2011-01-01[&location1=40.0,location2=-89.0]:1.0)[&location1=39.5,location2=-89.5,location1_95%_HPD={39.0,39.002,39.004,39.002,39.0},location2_95%_HPD={-90.0,-90.002,-90.004,-90.002,-90.0}]:1.0,TipC|2012-01-01[&location1=38.0,location2=-91.0]:2.0)[&location1=39.0,location2=-90.0];
+end;

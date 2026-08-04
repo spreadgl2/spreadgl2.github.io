@@ -1,0 +1,561 @@
+@import "../../styles/tokens.css";
+
+.sidebar {
+  width: var(--sidebar-width, 240px);
+  flex-shrink: 0;
+  height: 100%;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  /* The legend section grows to fill and scrolls internally, so the sidebar
+     itself doesn't scroll (top sections stay pinned). */
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: width var(--dur-base) var(--ease-out);
+}
+
+/* Icon-only rail at 1024–1279px and below 1024px */
+@media (max-width: 1279px) {
+  .sidebar {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    align-items: center;
+  }
+
+  .section {
+    width: 100%;
+    padding: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Hide all text content in rail mode */
+  .sectionTitle,
+  .fileName,
+  .tipCount,
+  .projectTrait,
+  .replaceBtn,
+  .dataItem,
+  .traitNameRow,
+  .traitMeta,
+  .traitEmpty,
+  .legendHeader,
+  .legendTitleWrap,
+  .legendList,
+  .legendPlaceholder,
+  .legendGradientWrap,
+  .legendSubLabel {
+    display: none;
+  }
+
+  /* Show rail icon button that expands sidebar on click */
+  .railIcon {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    color: var(--fg-tertiary);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .railIcon:hover {
+    background: var(--bg-elevated);
+    color: var(--fg-primary);
+  }
+}
+
+/* Always hide rail icon at full width */
+@media (min-width: 1280px) {
+  .railIcon {
+    display: none;
+  }
+}
+
+.section {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+/* The legend is the last section — grow it to fill the sidebar down to the
+   timeline, and let its list scroll internally rather than the whole sidebar. */
+.sectionLegend {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sectionTitle {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.fileName {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-md);
+  color: var(--fg-primary);
+  word-break: break-all;
+  margin-bottom: var(--space-1);
+}
+
+.replaceBtn {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.replaceBtn:hover {
+  border-color: var(--fg-tertiary);
+  color: var(--fg-primary);
+}
+
+.replaceBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.dataItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  margin-bottom: var(--space-2);
+}
+
+.dataItemLoaded {
+  color: var(--fg-primary);
+}
+
+.dataItemEmpty {
+  color: var(--fg-tertiary);
+}
+
+.dataIcon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dataIconLoaded {
+  background: var(--accent);
+}
+
+.dataIconEmpty {
+  background: var(--fg-tertiary);
+  opacity: 0.4;
+}
+
+.traitName {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-primary);
+}
+
+.projectTrait {
+  margin-bottom: var(--space-3);
+}
+
+.traitLabel {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+}
+
+.traitEmpty {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-tertiary);
+}
+
+.tipCount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.dataLabel {
+  flex-shrink: 0;
+  color: var(--fg-primary);
+}
+
+.dataValue {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dataValueWarn {
+  color: #e0894a;
+}
+
+.dataIconWarn {
+  background: #e0894a;
+}
+
+.dataValueError {
+  color: var(--color-error, #f87171);
+}
+
+.dataIconError {
+  background: var(--color-error, #f87171);
+}
+
+.dataItemBtn {
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dataPin {
+  flex-shrink: 0;
+  color: var(--fg-tertiary);
+}
+
+.dataItemBtn:hover .dataValue {
+  text-decoration: underline;
+}
+
+.dataItemBtn:hover .dataPin {
+  color: var(--fg-primary);
+}
+
+.inferredTag {
+  padding: 1px 4px;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+}
+
+.traitNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.traitMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.traitKind {
+  padding: 1px 5px;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-translucent);
+  border-radius: 3px;
+}
+
+.traitStates {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+}
+
+.traitSeparator {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+}
+
+.legendPlaceholder {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+  font-style: italic;
+}
+
+.legendList {
+  list-style: none;
+  margin: 0;
+  /* Inset the right edge so the scrollbar clears the right-aligned tip counts. */
+  padding: 0 var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* Fill the remaining sidebar height down to the timeline; scroll internally. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+}
+
+.legendSwatch {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legendLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right-aligned tip count per legend row (mono, tabular). */
+.legendCount {
+  flex-shrink: 0;
+  padding-left: var(--space-2);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+}
+
+/* The shown count (numerator) when a filter is active — same accent as the
+   FILTERED badge, so the visible tally reads as "filtered". */
+.legendCountShown {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+:global([data-theme="light"]) .legendCountShown {
+  color: #8a5a00;
+}
+
+.legendGradientWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legendGradientBar {
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legendGradientLabels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+}
+
+.legendSubLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.glyphItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+}
+
+.glyphShape {
+  flex-shrink: 0;
+  color: var(--fg-secondary);
+}
+
+.legendHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.legendTitleWrap {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.legendTitleWrap .sectionTitle {
+  margin-bottom: 0;
+}
+
+.legendTipTotal {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+}
+
+.legendFilteredBadge {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  background: rgb(245 158 11 / 15%);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+}
+
+:global([data-theme="light"]) .legendFilteredBadge {
+  color: #8a5a00;
+  background: rgb(138 90 0 / 14%);
+}
+
+.legendHeaderActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The Legend title doubles as the sort toggle — inherits .sectionTitle, resets
+   the button chrome, and hints interactivity on hover. */
+.legendTitleBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.legendTitleBtn:hover {
+  color: var(--fg-secondary);
+  text-decoration: underline;
+}
+
+.legendTitleBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.legendSelectedCount {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.showAllBtn {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.showAllBtn:hover {
+  opacity: 1;
+}
+
+.legendItemWrap {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legendClickable {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 1px 2px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: opacity var(--dur-fast, 120ms) ease-out;
+}
+
+.legendClickable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.legendClickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.showAllBtn:focus-visible,
+.dataItemBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.legendDeselected {
+  opacity: 0.35;
+}

@@ -1,0 +1,12 @@
+{
+  "id": "b117",
+  "label": "SARS-CoV-2 B.1.1.7 (Alpha) in the UK",
+  "tipCount": 17716,
+  "traitName": "location1/location2",
+  "dateSpan": [
+    2020.68,
+    2021.03
+  ],
+  "blurb": "Continuous phylogeography of SARS-CoV-2 Alpha lineage across the UK (reprojected EPSG:27700 to WGS84). ~17k tips: the high-volume performance fixture.",
+  "treePath": "examples/b117/tree.nex"
+}

@@ -1,0 +1,221 @@
+@import "../../styles/tokens.css";
+
+.header {
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.brand {
+  font-family: var(--font-sans);
+  font-size: var(--text-title);
+  font-weight: 600;
+  color: var(--fg-primary);
+  letter-spacing: 0.01em;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.fileLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* Thin rule between the view / panel / command groups. */
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+/* View group — persistent workspace toggles as a connected segmented control.
+   A filled segment reads as "this view is visible". */
+.viewGroup {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.viewBtn {
+  height: 28px;
+  padding: 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+/* Thin divider between adjacent segments. */
+.viewBtn + .viewBtn {
+  border-left: 1px solid var(--border-subtle);
+}
+
+/* Round only the outer corners so the ends follow the container radius. */
+.viewBtn:first-child {
+  border-top-left-radius: calc(var(--radius-md) - 1px);
+  border-bottom-left-radius: calc(var(--radius-md) - 1px);
+}
+
+.viewBtn:last-child {
+  border-top-right-radius: calc(var(--radius-md) - 1px);
+  border-bottom-right-radius: calc(var(--radius-md) - 1px);
+}
+
+.viewLabel {
+  line-height: 1;
+}
+
+.viewBtn:hover {
+  background: var(--bg-elevated);
+  color: var(--fg-primary);
+}
+
+.viewBtnActive,
+.viewBtnActive:hover {
+  background: var(--accent-translucent);
+  color: var(--accent);
+}
+
+/* Drawer buttons use an underline instead of the filled view-toggle state. */
+.panelGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.commands {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.panelBtn {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--fg-secondary);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.panelBtn:hover {
+  background: var(--bg-elevated);
+  color: var(--fg-primary);
+}
+
+.panelBtnOpen {
+  color: var(--fg-primary);
+}
+
+.panelBtnOpen::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+/* Filters affecting the data — amber icon plus a dot, so the cue isn't
+   colour alone (and doesn't collide with the teal open-drawer underline). */
+.panelBtnFiltered {
+  --filter-active: #f59e0b;
+
+  color: var(--filter-active);
+}
+
+:global([data-theme="light"]) .panelBtnFiltered {
+  --filter-active: #8a5a00;
+}
+
+.filterDot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--filter-active, #f59e0b);
+}
+
+.viewBtn:focus-visible,
+.panelBtn:focus-visible,
+.exportChip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.exportChip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+  height: 28px;
+  background: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.exportChip:hover {
+  border-color: var(--fg-tertiary);
+  color: var(--fg-primary);
+}
+
+.exportChipActive {
+  border-color: var(--accent);
+  color: var(--fg-primary);
+}

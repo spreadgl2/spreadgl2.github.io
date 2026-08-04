@@ -1,0 +1,41 @@
+@import "../../styles/tokens.css";
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  height: 36px;
+  flex-shrink: 0;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+}
+
+.message {
+  flex: 1;
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--fg-secondary);
+  flex-shrink: 0;
+  font-size: var(--text-lg);
+  line-height: 1;
+  padding: 0;
+}
+
+.close:hover {
+  background: var(--bg-base);
+  color: var(--fg-primary);
+}

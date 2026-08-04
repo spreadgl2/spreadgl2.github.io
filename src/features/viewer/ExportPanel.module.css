@@ -1,0 +1,227 @@
+@import "../../styles/tokens.css";
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--fg-primary);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  border-color: var(--accent);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.actionBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.fallbackHint {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.fallbackHint code {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xs);
+  color: var(--fg-primary);
+}
+
+.fallbackHint strong {
+  color: var(--fg-primary);
+}
+
+.sectionLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--fg-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+  min-width: 64px;
+  flex-shrink: 0;
+}
+
+.yearInput {
+  width: 72px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--fg-primary);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+}
+
+.yearInput:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.yearInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.isoHint {
+  font-size: var(--text-xs);
+  color: var(--fg-tertiary);
+  font-family: var(--font-sans);
+}
+
+.select {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--fg-primary);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.progressBar {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--dur-fast) linear;
+}
+
+.progressLabel {
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  min-width: 28px;
+  text-align: right;
+}
+
+.recordBtn {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--accent-translucent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: var(--text-md);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.recordBtn:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--fg-inverse);
+}
+
+.recordBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.recordBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.recordBtnActive {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+  color: var(--fg-secondary);
+}
+
+.recordBtnDone {
+  background: var(--accent-translucent);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.unsupported {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--warning);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.errorText {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-error, #f87171);
+  margin: 0;
+}

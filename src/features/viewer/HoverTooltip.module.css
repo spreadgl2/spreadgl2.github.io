@@ -1,0 +1,33 @@
+@import "../../styles/tokens.css";
+
+.tooltip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  max-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.taxon {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--fg-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.line {
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+  margin-top: var(--space-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}

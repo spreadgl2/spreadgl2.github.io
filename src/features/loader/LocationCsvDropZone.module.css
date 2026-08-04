@@ -1,0 +1,262 @@
+@import "../../styles/tokens.css";
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: max(var(--space-4), env(safe-area-inset-top))
+    max(var(--space-4), env(safe-area-inset-right)) max(var(--space-4), env(safe-area-inset-bottom))
+    max(var(--space-4), env(safe-area-inset-left));
+  background: var(--bg-base);
+}
+
+.errorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  gap: var(--space-4);
+  width: min(560px, 100%);
+  margin-block: auto;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--fg-primary);
+  text-align: center;
+}
+
+.body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  color: var(--fg-secondary);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.sample {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  white-space: pre;
+  width: 100%;
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 160px;
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+  gap: var(--space-3);
+  cursor: default;
+}
+
+.openFileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  color: var(--fg-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  cursor: pointer;
+}
+
+.openFileBtn:hover {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.openFileBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.dropZoneDragging {
+  border-color: var(--accent);
+  background: var(--accent-translucent);
+}
+
+.dropLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-title);
+  color: var(--fg-primary);
+}
+
+.dropFormats {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+}
+
+.error {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--error);
+  text-align: center;
+  margin: 0;
+}
+
+.ambiguousModal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: none;
+  width: min(520px, 100%);
+  box-sizing: border-box;
+  margin-block: auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 1.4fr);
+  gap: var(--space-2) var(--space-4);
+}
+
+.summaryRow {
+  display: contents;
+}
+
+.summaryLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-tertiary);
+}
+
+.summaryValue {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-md);
+  color: var(--fg-primary);
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  color: var(--fg-secondary);
+}
+
+.select {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-lg);
+  color: var(--fg-primary);
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+
+.confirmBtn {
+  align-self: flex-end;
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent);
+  color: var(--fg-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.confirmBtn:hover {
+  background: var(--accent-hover);
+}
+
+.skipGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.skipBtn {
+  padding: var(--space-2) var(--space-4);
+  background: none;
+  color: var(--fg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.skipBtn:hover {
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+}
+
+.skipHint {
+  margin: 0;
+  max-width: 42ch;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (max-height: 700px) {
+  .dropZone {
+    height: 112px;
+  }
+
+  .sample {
+    padding-block: var(--space-2);
+  }
+}

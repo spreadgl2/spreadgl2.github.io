@@ -1,0 +1,16 @@
+{
+  "id": "pedv",
+  "label": "PEDV in China",
+  "tipCount": 769,
+  "traitName": "location",
+  "traitKind": "discrete",
+  "dateSpan": [
+    2010,
+    2018
+  ],
+  "blurb": "Discrete phylogeography of porcine epidemic diarrhea virus across Chinese provinces, with BSSVS multi-state ancestors.",
+  "treePath": "examples/pedv/tree.nex",
+  "locationsPath": "examples/pedv/locations.csv",
+  "boundariesPath": "examples/pedv/boundaries.geojson",
+  "environmentPath": "examples/pedv/environment.csv"
+}
