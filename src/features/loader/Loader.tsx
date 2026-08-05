@@ -1,5 +1,5 @@
 import * as Comlink from 'comlink';
-import { X } from 'lucide-react';
+import { ChevronRight, FileUp, Upload, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FixtureMeta, FixturesManifest } from '../../lib/format/fixture-meta';
 import { detectLookupCSV } from '../../lib/format/lookup-csv';
@@ -27,6 +27,7 @@ import { ErrorPanel } from './ErrorPanel';
 import { ERROR_COPY, type ParseErrorCode } from './error-copy';
 import { ImportSettingsModal, type ImportSettingsSelection } from './ImportSettingsModal';
 import { LandingHeader } from './LandingHeader';
+import { LandingPage } from './LandingPage';
 import styles from './Loader.module.css';
 import { MrsdModal } from './MrsdModal';
 import { StatusBar } from './StatusBar';
@@ -90,6 +91,12 @@ function publicAssetPath(path: string): string {
   const base = import.meta.env.BASE_URL || '/';
   const cleanBase = base.endsWith('/') ? base : `${base}/`;
   return `${cleanBase}${path.replace(/^\/+/, '')}`;
+}
+
+const TIP_COUNT_FORMATTER = new Intl.NumberFormat('en-US');
+
+function exampleYears(dateSpan: [number, number]): string {
+  return `${Math.floor(dateSpan[0])}\u2013${Math.floor(dateSpan[1])}`;
 }
 
 interface LoaderProps {
@@ -917,9 +924,12 @@ export function Loader({
           <span className={styles.loadingText}>Parsing…</span>
         ) : (
           <>
-            <span className={styles.dropLabel}>Drop a BEAST X tree file here</span>
+            <Upload className={styles.dropIcon} aria-hidden="true" />
+            <span className={styles.dropLabel}>Drop a BEAST X tree or SpreadGL2 project here</span>
             <span className={styles.dropFormats}>
-              .tree&nbsp;&nbsp;.nex&nbsp;&nbsp;.nexus&nbsp;&nbsp;.trees&nbsp;&nbsp;.spreadgl2.json
+              {['.tree', '.nex', '.nexus', '.trees', '.spreadgl2.json'].map((format) => (
+                <span key={format}>{format}</span>
+              ))}
             </span>
           </>
         )}
@@ -936,6 +946,7 @@ export function Loader({
         data-testid="loader-open-btn"
         ref={openButtonRef}
       >
+        <FileUp size={16} aria-hidden="true" />
         Open file…
       </button>
 
@@ -958,7 +969,7 @@ export function Loader({
 
       {!replacement && examples.length > 0 && (
         <div className={styles.examples}>
-          <span className={styles.orLabel}>or pick an example</span>
+          <h2 className={styles.examplesTitle}>Try an example</h2>
           <div className={styles.exampleChips} data-testid="example-chips">
             {examples.map((ex) => (
               <button
@@ -972,8 +983,20 @@ export function Loader({
                 disabled={loading}
                 data-testid={`example-${ex.id}`}
               >
-                <span className={styles.chipLabel}>{ex.label}</span>
-                <span className={styles.chipMeta}>{ex.tipCount} tips</span>
+                <span>
+                  <span className={styles.chipLabel}>{ex.label}</span>
+                  <span className={styles.chipMeta}>
+                    {TIP_COUNT_FORMATTER.format(ex.tipCount)} tips
+                    {ex.traitKind && <> · {ex.traitKind}</>} · {exampleYears(ex.dateSpan)}
+                    {ex.tipCount >= 10_000 && (
+                      <>
+                        {' '}
+                        · <span className={styles.largeNote}>large dataset</span>
+                      </>
+                    )}
+                  </span>
+                </span>
+                <ChevronRight className={styles.rowArrow} aria-hidden="true" />
               </button>
             ))}
           </div>
@@ -1029,7 +1052,7 @@ export function Loader({
       {!overlayOnly && !replacement && (
         <div className={styles.root} data-testid="loader-root">
           <LandingHeader />
-          <div className={styles.center}>{loaderContent}</div>
+          <LandingPage action={loaderContent} />
         </div>
       )}
     </>

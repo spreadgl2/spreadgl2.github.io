@@ -1,0 +1,80 @@
+import { expect, test } from '@playwright/test';
+
+test.describe('Landing page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.clear());
+  });
+
+  test('presents the product, import actions, examples, citation, and credits on desktop', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 2048, height: 1185 });
+    await page.goto('/');
+
+    await expect(page.locator('[data-testid="landing-title"]')).toHaveText('SpreadGL2');
+    await expect(page.locator('[data-testid="landing-subtitle"]')).toHaveText(
+      'High-performance interactive visualization for BEAST X phylogeographic analyses',
+    );
+    await expect(page.locator('[data-testid="drop-zone"]')).toContainText(
+      'Drop a BEAST X tree or SpreadGL2 project here',
+    );
+    await expect(page.locator('[data-testid="example-b117"]')).toContainText(
+      '17,716 tips · continuous · 2020–2021 · large dataset',
+    );
+
+    const details = await page.locator('[data-testid="landing-details"]').boundingBox();
+    const action = await page.locator('[data-testid="landing-action"]').boundingBox();
+    const shell = await page.locator('[data-testid="landing-page"] main').boundingBox();
+    const title = await page.locator('[data-testid="landing-title"]').boundingBox();
+    const subtitle = await page.locator('[data-testid="landing-subtitle"]').boundingBox();
+    expect(details).toBeTruthy();
+    expect(action).toBeTruthy();
+    expect(shell).toBeTruthy();
+    expect(title).toBeTruthy();
+    expect(subtitle).toBeTruthy();
+    expect(shell!.width).toBeGreaterThanOrEqual(1_350);
+    expect(title!.y).toBeGreaterThanOrEqual(105);
+    expect(title!.y).toBeLessThanOrEqual(125);
+    expect(action!.y - (subtitle!.y + subtitle!.height)).toBeGreaterThanOrEqual(48);
+    expect(details!.x).toBeLessThan(action!.x);
+    expect(
+      await page.locator('[data-testid="landing-page"]').evaluate(
+        (element) => element.scrollWidth <= element.clientWidth,
+      ),
+    ).toBe(true);
+
+    const citationTrigger = page.locator('[data-testid="landing-citation-btn"]');
+    await citationTrigger.click();
+    await expect(page.locator('[data-testid="citation-modal"]')).toBeVisible();
+    await expect(page.locator('[data-testid="citation-text"]')).toContainText('Hong SL et al.');
+    await page.locator('[data-testid="citation-close-btn"]').click();
+    await expect(citationTrigger).toBeFocused();
+
+    await page.locator('[data-testid="landing-credits-btn"]').click();
+    await expect(page.locator('[data-testid="about-modal"]')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Samuel L. Hong' })).toHaveAttribute(
+      'href',
+      'https://orcid.org/0000-0001-6354-4943',
+    );
+  });
+
+  test('stacks the import actions before details without horizontal overflow on mobile', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.locator('[data-testid="small-screen-continue"]').click();
+
+    const action = await page.locator('[data-testid="landing-action"]').boundingBox();
+    const details = await page.locator('[data-testid="landing-details"]').boundingBox();
+    expect(action).toBeTruthy();
+    expect(details).toBeTruthy();
+    expect(action!.y).toBeLessThan(details!.y);
+    expect(
+      await page.locator('[data-testid="landing-page"]').evaluate(
+        (element) => element.scrollWidth <= element.clientWidth,
+      ),
+    ).toBe(true);
+    await expect(page.locator('[data-testid="drop-zone"]')).toBeVisible();
+  });
+});

@@ -62,6 +62,12 @@ body {
   --text-title: 16px;
   --text-xl: 18px;
   --text-2xl: 20px;
+  --text-3xl: 70px;
+  --text-landingtitlemobile: 44px;
+  --text-landingsubtitlemobile: 18px;
+  --text-landingsecondary: 17px;
+  --text-landingcopy: 18px;
+  --text-landingsubtitle: 23px;
 
   --line-tight: 1.2;
   --line-ui: 1.35;

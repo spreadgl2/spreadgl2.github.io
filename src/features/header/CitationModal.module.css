@@ -19,7 +19,6 @@
   max-height: calc(100dvh - var(--space-8));
   box-sizing: border-box;
   overflow-y: auto;
-  overscroll-behavior: contain;
   padding: 26px;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
@@ -65,24 +64,8 @@
   line-height: 1.25;
 }
 
-.creditSection {
-  padding: 17px 0;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.creditSection:first-of-type {
-  margin-top: 18px;
-}
-
-.creditSection h3 {
-  margin: 0 0 6px;
-  color: var(--fg-primary);
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  font-weight: 650;
-}
-
-.creditSection p {
+.intro,
+.note {
   margin: 0;
   color: var(--fg-secondary);
   font-family: var(--font-sans);
@@ -90,34 +73,57 @@
   line-height: 1.55;
 }
 
-.developerCredit {
-  display: block;
-  margin-top: var(--space-2);
+.citationBox {
+  margin: 20px 0 14px;
+  padding: var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: 1.55;
 }
 
-.inlineLink {
-  color: var(--fg-secondary);
-  text-decoration-color: var(--border-default);
-  text-underline-offset: 3px;
-}
-
-.inlineLink:hover {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
-}
-
-.developerLink {
-  color: var(--accent);
-  font-weight: 650;
-  text-decoration-color: var(--accent);
-}
-
-.footer {
+.actions {
   display: flex;
-  padding-top: var(--space-4);
+  margin-bottom: 15px;
   flex-wrap: wrap;
-  border-top: 1px solid var(--border-subtle);
-  gap: 18px;
+  gap: var(--space-2);
+}
+
+.action {
+  min-height: 36px;
+  padding: 7px var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--fg-primary);
+  cursor: pointer;
   font-family: var(--font-sans);
   font-size: var(--text-sm);
+}
+
+.action:hover {
+  border-color: var(--accent);
+}
+
+.primaryAction {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--fg-inverse);
+  font-weight: 650;
+}
+
+.copyStatus {
+  min-height: 18px;
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+}
+
+.note {
+  color: var(--fg-tertiary);
+  font-size: var(--text-xs);
 }
