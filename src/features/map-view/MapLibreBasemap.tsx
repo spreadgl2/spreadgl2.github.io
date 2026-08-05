@@ -1,6 +1,10 @@
+import { setWorkerUrl } from 'maplibre-gl';
+import mapLibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import type React from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
 import { Map as MapLibreMap } from 'react-map-gl/maplibre';
+
+setWorkerUrl(mapLibreWorkerUrl);
 
 interface MapLibreViewState {
   longitude: number;

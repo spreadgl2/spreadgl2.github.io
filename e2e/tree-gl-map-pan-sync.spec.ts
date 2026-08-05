@@ -51,6 +51,17 @@ async function stableMapCanvasSignature(page: import('@playwright/test').Page) {
 }
 
 test.describe('tree-gl map interaction', () => {
+  test('paints the B.1.1.7 basemap after the large viewer settles', async ({ page }) => {
+    await page.setViewportSize({ width: 1936, height: 1255 });
+    await page.goto('/?dev=tree-gl');
+    await dropTree(page, '/examples/b117/tree.nex', 'tree.nex');
+    await expect(page.locator('[data-testid="btn-play"]')).toBeEnabled({ timeout: 60_000 });
+    await page.locator('.maplibregl-canvas').waitFor({ state: 'visible', timeout: 60_000 });
+
+    await page.waitForTimeout(6000);
+    expect((await mapCanvasSignature(page)).length).toBeGreaterThan(50_000);
+  });
+
   test('dragging the map moves the MapLibre basemap with DeckGL layers', async ({ page }) => {
     await page.goto('/?dev=tree-gl');
     await dropTree(page, '/examples/yfv/tree.nex', 'tree.nex');
