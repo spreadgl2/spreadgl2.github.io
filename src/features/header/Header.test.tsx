@@ -24,7 +24,9 @@ afterEach(() => {
 describe('Header', () => {
   it('renders brand mark', () => {
     render(<Header />);
-    expect(screen.getByText('SpreadGL2')).toBeTruthy();
+    const brand = screen.getByTestId('header-brand-link');
+    expect(brand.textContent).toBe('SpreadGL2');
+    expect(brand.getAttribute('href')).toBe('/');
   });
 
   it('renders the shared brand controls (theme/docs/about) and no file label', () => {

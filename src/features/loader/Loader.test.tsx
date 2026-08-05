@@ -239,6 +239,7 @@ describe('Loader', () => {
 
   it('renders the landing title, product description, privacy claim, and resources', () => {
     render(<Loader onParsed={vi.fn()} />);
+    expect(screen.getByTestId('landing-brand-link').getAttribute('href')).toBe('/');
     expect(screen.getByRole('heading', { level: 1, name: 'SpreadGL2' })).toBeTruthy();
     expect(
       screen.getByText(
