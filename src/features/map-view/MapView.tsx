@@ -642,7 +642,6 @@ function buildPrimaryLayer(
       getFilterValue: tripFilterConfig.getFilterValue,
       filterRange: tripFilterConfig.filterRange,
       extensions: TRIP_FILTER_EXTENSIONS,
-      rounded: true,
       capRounded: true,
       jointRounded: true,
       pickable: false,

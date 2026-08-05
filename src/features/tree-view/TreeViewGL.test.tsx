@@ -33,6 +33,7 @@ vi.mock('@deck.gl/react', () => ({
 }));
 
 vi.mock('deck.gl', () => ({
+  COORDINATE_SYSTEM: { CARTESIAN: 0 },
   OrthographicView: class OrthographicView {
     constructor(props: Record<string, unknown>) {
       Object.assign(this, props);
@@ -62,7 +63,7 @@ vi.mock('deck.gl', () => ({
 
 vi.mock('../../lib/tree-render/glyph-atlas', () => ({
   buildGlyphAtlas: () => ({
-    iconAtlas: 'data:image/png;base64,mock',
+    iconAtlas: document.createElement('canvas'),
     iconMapping: {
       circle: { x: 0, y: 0, width: 64, height: 64, mask: true },
       triangle: { x: 64, y: 0, width: 64, height: 64, mask: true },
@@ -1991,12 +1992,12 @@ describe('TreeViewGL', () => {
     const tipsLayer = (
       capturedLayers as {
         id: string;
-        iconAtlas?: string;
+        iconAtlas?: HTMLCanvasElement;
         iconMapping?: Record<string, unknown>;
       }[]
     ).find((l) => l.id === 'tips');
     expect(tipsLayer).toBeDefined();
-    expect(tipsLayer?.iconAtlas).toBe('data:image/png;base64,mock');
+    expect(tipsLayer?.iconAtlas).toBeInstanceOf(HTMLCanvasElement);
     expect(tipsLayer?.iconMapping).toBeDefined();
   });
 
@@ -2168,10 +2169,12 @@ describe('TreeViewGL', () => {
       render(<TreeViewGL />);
     });
 
-    const layerIds = (capturedLayers as { id: string }[]).map((l) => l.id);
+    const layers = capturedLayers as { id: string; coordinateSystem?: number }[];
+    const layerIds = layers.map((l) => l.id);
     expect(layerIds).toContain('window-band');
     expect(layerIds).toContain('window-edges');
     expect(layerIds.indexOf('window-band')).toBeLessThan(layerIds.indexOf('branches'));
+    expect(layers.find((layer) => layer.id === 'window-band')?.coordinateSystem).toBe(0);
   });
 
   it('2D: Trail mode omits window band and edge layers', () => {

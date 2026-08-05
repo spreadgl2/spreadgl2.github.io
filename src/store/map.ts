@@ -1,9 +1,9 @@
-import type maplibregl from 'maplibre-gl';
+import type { Map as MapLibreMap } from 'maplibre-gl';
 import { create } from 'zustand';
 
 interface MapStore {
-  mapInstance: maplibregl.Map | null;
-  setMapInstance: (m: maplibregl.Map | null) => void;
+  mapInstance: MapLibreMap | null;
+  setMapInstance: (m: MapLibreMap | null) => void;
 }
 
 export const useMapStore = create<MapStore>((set) => ({

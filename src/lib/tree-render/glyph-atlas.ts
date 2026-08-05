@@ -1,10 +1,11 @@
+import type { TextureSource } from 'deck.gl';
 import { TIP_GLYPHS, type TipGlyph, traceTipGlyphPath } from './glyphs.js';
 
 export const ATLAS_CELL = 64;
 export const ATLAS_GLYPHS: readonly TipGlyph[] = TIP_GLYPHS;
 
 export interface GlyphAtlas {
-  iconAtlas: string;
+  iconAtlas: TextureSource;
   iconMapping: Record<
     TipGlyph,
     { x: number; y: number; width: number; height: number; mask: boolean }
@@ -33,5 +34,5 @@ export function buildGlyphAtlas(): GlyphAtlas {
       mask: true,
     };
   }
-  return { iconAtlas: canvas.toDataURL(), iconMapping };
+  return { iconAtlas: canvas, iconMapping };
 }

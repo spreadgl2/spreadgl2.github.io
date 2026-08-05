@@ -1,6 +1,8 @@
 import { DeckGL } from '@deck.gl/react';
 import {
+  COORDINATE_SYSTEM,
   IconLayer,
+  type IconLayerProps,
   LineLayer,
   OrthographicView,
   ScatterplotLayer,
@@ -785,7 +787,7 @@ export function useTreeGlDeckModel() {
       new IconLayer({
         id: 'tips',
         data: tipData,
-        iconAtlas: glyphAtlas.iconAtlas,
+        iconAtlas: glyphAtlas.iconAtlas as unknown as NonNullable<IconLayerProps['iconAtlas']>,
         iconMapping: glyphAtlas.iconMapping,
         getPosition: (n) => [px(n.x), py(n.y)],
         getSize: () => tipRadius * 2,
@@ -904,6 +906,7 @@ export function useTreeGlDeckModel() {
         ? new SolidPolygonLayer({
             id: 'window-band',
             data: windowBandData,
+            coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
             getPolygon: (d: number[][]) => d as unknown as [number, number][],
             getFillColor: [30, 144, 255, 31] as RGBAColor,
             pickable: false,
