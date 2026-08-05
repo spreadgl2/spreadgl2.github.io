@@ -170,7 +170,7 @@ export function Header() {
             onClick={() => toggle('export')}
           >
             <ExternalLink size={12} />
-            Export
+            <span className={styles.exportLabel}>Export</span>
           </button>
           <button
             type="button"

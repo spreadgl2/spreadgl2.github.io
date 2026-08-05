@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background: var(--bg-base);
 }
 
@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 240px;
+  height: clamp(210px, 24vh, 240px);
   padding: var(--space-6);
   box-sizing: border-box;
   border: 2px solid var(--border-default);
@@ -97,7 +97,7 @@
 .chip {
   display: grid;
   width: 100%;
-  min-height: 66px;
+  min-height: clamp(58px, 7vh, 66px);
   align-items: center;
   padding: 11px 14px 11px var(--space-4);
   border: 1px solid var(--border-default);
@@ -291,7 +291,7 @@
 
 @media (max-width: 620px) {
   .dropZone {
-    height: 210px;
+    height: clamp(190px, 26vh, 210px);
     padding: 20px;
   }
 
@@ -301,19 +301,5 @@
 
   .dropFormats {
     max-width: 29ch;
-  }
-}
-
-@media (max-height: 760px) and (min-width: 1025px) {
-  .dropZone {
-    height: 210px;
-  }
-
-  .examples {
-    margin-top: 22px;
-  }
-
-  .chip {
-    min-height: 58px;
   }
 }

@@ -122,6 +122,20 @@ describe('Drawer', () => {
     expect(useUiStore.getState().datesPanelWidth).toBe(1000);
   });
 
+  it('clamps a resized left panel to the available viewport width', () => {
+    const originalWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 800 });
+    useUiStore.setState({ activePanel: 'dates', datesPanelWidth: 480 });
+    render(<Drawer />);
+
+    fireEvent.mouseDown(screen.getByTestId('drawer-resize-handle'), { clientX: 480 });
+    fireEvent.mouseMove(window, { clientX: 5000 });
+    fireEvent.mouseUp(window);
+
+    expect(useUiStore.getState().datesPanelWidth).toBe(784);
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalWidth });
+  });
+
   it('resizes the locations panel independently of the dates panel', () => {
     useUiStore.setState({
       activePanel: 'locations',

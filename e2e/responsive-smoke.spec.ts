@@ -3,8 +3,8 @@ import { confirmImportSettings } from './helpers';
 
 const VIEWPORTS = [
   { name: '1280×800 (full desktop)', width: 1280, height: 800 },
-  { name: '1024×768 (narrow desktop — sidebar rail)', width: 1024, height: 768 },
-  { name: '800×600 (below minimum — guard shown)', width: 800, height: 600 },
+  { name: '1024×768 (compact desktop)', width: 1024, height: 768 },
+  { name: '800×600 (sidebar rail)', width: 800, height: 600 },
 ] as const;
 
 test.describe('Responsive smoke', () => {
@@ -43,22 +43,50 @@ test.describe('Responsive smoke', () => {
       const playBtn = page.locator('[data-testid="btn-play"]');
       await expect(playBtn).toBeEnabled({ timeout: 10000 });
 
-      if (vp.width >= 1024 && vp.width < 1280) {
-        // At narrow desktop, sidebar should collapse to 48px rail
-        const sidebar = page.locator('[data-testid="sidebar"]');
-        await expect(sidebar).toBeVisible();
-        const box = await sidebar.boundingBox();
-        expect(box, 'sidebar bounding box should exist').toBeTruthy();
-        // Rail is 48px wide; allow a few px tolerance for borders
-        expect(box!.width, `sidebar width at ${vp.width}px should be ≤52px`).toBeLessThanOrEqual(52);
-      } else if (vp.width >= 1280) {
-        // Full desktop: sidebar should be 240px
-        const sidebar = page.locator('[data-testid="sidebar"]');
-        await expect(sidebar).toBeVisible();
-        const box = await sidebar.boundingBox();
-        expect(box, 'sidebar bounding box should exist').toBeTruthy();
-        expect(box!.width, 'sidebar width at full desktop should be ≥230px').toBeGreaterThanOrEqual(230);
+      const sidebar = page.locator('[data-testid="sidebar"]');
+      await expect(sidebar).toBeVisible();
+      const sidebarBox = await sidebar.boundingBox();
+      expect(sidebarBox, 'sidebar bounding box should exist').toBeTruthy();
+
+      if (vp.width < 960) {
+        expect(sidebarBox!.width, `sidebar at ${vp.width}px should be a rail`).toBeLessThanOrEqual(52);
+        expect(
+          await sidebar.evaluate((element) => element.scrollWidth <= element.clientWidth),
+        ).toBe(true);
+      } else if (vp.width < 1280) {
+        expect(sidebarBox!.width, `sidebar at ${vp.width}px should stay expanded`).toBeGreaterThanOrEqual(
+          175,
+        );
+        expect(sidebarBox!.width).toBeLessThanOrEqual(225);
+      } else {
+        expect(sidebarBox!.width, 'sidebar at full desktop should stay expanded').toBeGreaterThanOrEqual(
+          215,
+        );
+        expect(sidebarBox!.width).toBeLessThanOrEqual(265);
       }
+
+      const treeLabel = page.locator('[data-testid="header-toggle-tree"] span');
+      if (vp.width <= 1150) {
+        await expect(treeLabel).toBeHidden();
+      } else {
+        await expect(treeLabel).toBeVisible();
+      }
+
+      const exportLabel = page.locator('[data-testid="header-btn-export"] span');
+      if (vp.width <= 900) {
+        await expect(exportLabel).toBeHidden();
+      } else {
+        await expect(exportLabel).toBeVisible();
+      }
+
+      await page.locator('[data-testid="header-btn-settings"]').click();
+      const drawer = page.locator('[data-testid="drawer"]');
+      await expect(drawer).toBeVisible();
+      const drawerBox = await drawer.boundingBox();
+      expect(drawerBox, 'drawer bounding box should exist').toBeTruthy();
+      expect(drawerBox!.width).toBeGreaterThanOrEqual(275);
+      expect(drawerBox!.width).toBeLessThanOrEqual(365);
+      expect(drawerBox!.width).toBeLessThanOrEqual(vp.width - sidebarBox!.width);
     });
   }
 });

@@ -66,10 +66,10 @@ export function Drawer() {
     const applyWidth = isDatesPanel ? setDatesPanelWidth : setLocationsPanelWidth;
     const prefKey = isDatesPanel ? 'datesPanelWidth' : 'locationsPanelWidth';
     const onMove = (mv: globalThis.MouseEvent) => {
-      const next = Math.max(
-        MIN_LEFT_DRAWER_WIDTH,
-        Math.min(MAX_LEFT_DRAWER_WIDTH, mv.clientX - left),
-      );
+      const availableWidth = window.innerWidth - left - 16;
+      const maxWidth = Math.max(220, Math.min(MAX_LEFT_DRAWER_WIDTH, availableWidth));
+      const minWidth = Math.min(MIN_LEFT_DRAWER_WIDTH, maxWidth);
+      const next = Math.max(minWidth, Math.min(maxWidth, mv.clientX - left));
       applyWidth(next);
       setPreference(prefKey, next);
     };

@@ -12,6 +12,7 @@ test.describe('Landing page', () => {
     await page.goto('/');
 
     await expect(page.locator('[data-testid="landing-title"]')).toHaveText('SpreadGL2');
+    await expect(page.locator('[data-testid="landing-title"]')).toHaveCSS('font-size', '70px');
     await expect(page.locator('[data-testid="landing-subtitle"]')).toHaveText(
       'High-performance interactive visualization for BEAST X phylogeographic analyses',
     );
@@ -33,8 +34,8 @@ test.describe('Landing page', () => {
     expect(title).toBeTruthy();
     expect(subtitle).toBeTruthy();
     expect(shell!.width).toBeGreaterThanOrEqual(1_350);
-    expect(title!.y).toBeGreaterThanOrEqual(105);
-    expect(title!.y).toBeLessThanOrEqual(125);
+    expect(title!.y).toBeGreaterThanOrEqual(100);
+    expect(title!.y).toBeLessThanOrEqual(120);
     expect(action!.y - (subtitle!.y + subtitle!.height)).toBeGreaterThanOrEqual(48);
     expect(details!.x).toBeLessThan(action!.x);
     expect(
@@ -76,5 +77,35 @@ test.describe('Landing page', () => {
       ),
     ).toBe(true);
     await expect(page.locator('[data-testid="drop-zone"]')).toBeVisible();
+    await expect(page.locator('[data-testid="landing-title"]')).toHaveCSS('font-size', '44px');
+    await expect(page.locator('[data-testid="landing-subtitle"]')).toHaveCSS('font-size', '18px');
+  });
+
+  test('uses compact typography and layout tiers without intermediate width jumps', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+
+    const title = page.locator('[data-testid="landing-title"]');
+    const subtitle = page.locator('[data-testid="landing-subtitle"]');
+    await expect(title).toHaveCSS('font-size', '62px');
+    await expect(subtitle).toHaveCSS('font-size', '22px');
+
+    const wideDetails = await page.locator('[data-testid="landing-details"]').boundingBox();
+    const wideAction = await page.locator('[data-testid="landing-action"]').boundingBox();
+    expect(wideDetails).toBeTruthy();
+    expect(wideAction).toBeTruthy();
+    expect(wideDetails!.x).toBeLessThan(wideAction!.x);
+
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await expect(title).toHaveCSS('font-size', '54px');
+    await expect(subtitle).toHaveCSS('font-size', '20px');
+
+    const compactDetails = await page.locator('[data-testid="landing-details"]').boundingBox();
+    const compactAction = await page.locator('[data-testid="landing-action"]').boundingBox();
+    expect(compactDetails).toBeTruthy();
+    expect(compactAction).toBeTruthy();
+    expect(compactAction!.y).toBeLessThan(compactDetails!.y);
   });
 });

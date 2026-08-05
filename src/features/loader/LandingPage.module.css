@@ -9,19 +9,19 @@
 
 .shell {
   display: grid;
-  width: min(1360px, calc(100% - 64px));
+  width: min(1360px, calc(100% - clamp(32px, 6vw, 96px)));
   margin: 0 auto auto;
-  padding: 55px 0;
-  column-gap: 72px;
+  padding-block: clamp(28px, 5vh, 55px);
+  column-gap: clamp(40px, 4vw, 72px);
   grid-template-areas:
     "intro intro"
     "details action";
   grid-template-columns: minmax(340px, 0.86fr) minmax(500px, 1.14fr);
-  row-gap: 38px;
+  row-gap: clamp(30px, 3.2vh, 38px);
 }
 
 .intro {
-  padding-bottom: 38px;
+  padding-bottom: clamp(16px, 3vh, 38px);
   grid-area: intro;
   text-align: center;
 }
@@ -173,17 +173,37 @@
   grid-area: action;
 }
 
+@media (max-width: 1599px) and (min-width: 1200px) {
+  .title {
+    font-size: var(--text-landingtitlemedium);
+  }
+
+  .subtitle {
+    font-size: var(--text-landingsubtitlemedium);
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 621px) {
+  .title {
+    font-size: var(--text-landingtitlecompact);
+  }
+
+  .subtitle {
+    font-size: var(--text-landingsubtitlecompact);
+  }
+}
+
 @media (max-width: 1024px) {
   .shell {
-    width: min(620px, calc(100% - 48px));
-    padding: 24px 0 56px;
+    width: min(700px, calc(100% - clamp(32px, 6vw, 64px)));
+    padding-block: clamp(24px, 4vh, 40px);
     grid-template-areas:
       "intro"
       "action"
       "details";
-    grid-template-columns: minmax(0, 620px);
+    grid-template-columns: minmax(0, 700px);
     justify-content: center;
-    row-gap: 32px;
+    row-gap: clamp(26px, 3vh, 32px);
   }
 
   .intro,
@@ -196,8 +216,8 @@
 @media (max-width: 620px) {
   .shell {
     width: calc(100% - 32px);
-    padding: 20px 0 40px;
-    row-gap: 26px;
+    padding-block: clamp(20px, 4vh, 32px);
+    row-gap: clamp(24px, 3vh, 28px);
   }
 
   .title {
@@ -208,11 +228,5 @@
   .subtitle {
     max-width: 30ch;
     font-size: var(--text-landingsubtitlemobile);
-  }
-}
-
-@media (max-height: 760px) and (min-width: 1025px) {
-  .shell {
-    padding: 20px 0 36px;
   }
 }
