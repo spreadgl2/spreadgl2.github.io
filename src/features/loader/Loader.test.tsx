@@ -234,7 +234,22 @@ describe('Loader', () => {
   it('renders drop zone', async () => {
     render(<Loader onParsed={vi.fn()} />);
     expect(screen.getByTestId('drop-zone')).toBeTruthy();
-    expect(screen.getByText(/Drop a BEAST X tree file here/)).toBeTruthy();
+    expect(screen.getByText(/Drop a BEAST X tree or SpreadGL2 project here/)).toBeTruthy();
+  });
+
+  it('renders the landing title, product description, privacy claim, and resources', () => {
+    render(<Loader onParsed={vi.fn()} />);
+    expect(screen.getByTestId('landing-brand-link').getAttribute('href')).toBe('/');
+    expect(screen.getByRole('heading', { level: 1, name: 'SpreadGL2' })).toBeTruthy();
+    expect(
+      screen.getByText(
+        'High-performance interactive visualization for BEAST X phylogeographic analyses',
+      ),
+    ).toBeTruthy();
+    expect(screen.getByText(/SpreadGL2 uses/)).toBeTruthy();
+    expect(screen.getByText('Your research data stays on your device')).toBeTruthy();
+    expect(screen.getByTestId('landing-citation-btn')).toBeTruthy();
+    expect(screen.getByTestId('landing-credits-btn')).toBeTruthy();
   });
 
   it('renders PEDV example button after manifest loads', async () => {
@@ -242,6 +257,17 @@ describe('Loader', () => {
     await waitFor(() => {
       expect(screen.getByTestId('example-pedv')).toBeTruthy();
     });
+    expect(screen.getByText(/769 tips · discrete · 2010–2018/)).toBeTruthy();
+  });
+
+  it('keeps landing content and examples out of the replacement dialog', async () => {
+    render(<Loader onParsed={vi.fn()} replacement onCancel={vi.fn()} />);
+    expect(screen.getByTestId('replace-file-modal')).toBeTruthy();
+    expect(screen.queryByTestId('landing-page')).toBeNull();
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith('/examples/examples.json');
+    });
+    expect(screen.queryByTestId('example-pedv')).toBeNull();
   });
 
   it('clicking PEDV example fires fetch and worker parse', async () => {

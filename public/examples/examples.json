@@ -18,9 +18,10 @@
     },
     {
       "id": "yfv",
-      "label": "Yellow Fever virus in Brazil",
+      "label": "Yellow fever virus in Brazil",
       "tipCount": 705,
       "traitName": "location1/location2",
+      "traitKind": "continuous",
       "dateSpan": [
         2015.6247,
         2019.2877
@@ -31,9 +32,10 @@
     },
     {
       "id": "b117",
-      "label": "SARS-CoV-2 B.1.1.7 (Alpha) in the UK",
+      "label": "SARS-CoV-2 Alpha in the UK",
       "tipCount": 17716,
       "traitName": "location1/location2",
+      "traitKind": "continuous",
       "dateSpan": [
         2020.68,
         2021.03

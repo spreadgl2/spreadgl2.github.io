@@ -2,10 +2,11 @@
 
 .drawer {
   position: fixed;
-  top: 48px;
+  top: var(--header-height);
   right: 0;
   width: var(--drawer-width, 320px);
-  height: calc(100% - 48px);
+  max-width: calc(100vw - var(--sidebar-width));
+  height: calc(100dvh - var(--header-height));
   background: var(--bg-surface);
   border-left: 1px solid var(--border-subtle);
   display: flex;
@@ -24,6 +25,7 @@
   --drawer-width: 384px;
   left: var(--sidebar-width, 240px);
   right: auto;
+  max-width: calc(100vw - var(--sidebar-width) - var(--space-4));
   border-left: none;
   border-right: 1px solid var(--border-subtle);
   clip-path: inset(0 0 0 0);
@@ -56,7 +58,7 @@
   justify-content: space-between;
   padding: var(--space-4);
   border-bottom: 1px solid var(--border-subtle);
-  height: 48px;
+  height: var(--header-height);
   box-sizing: border-box;
   flex-shrink: 0;
 }

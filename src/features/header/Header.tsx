@@ -14,6 +14,8 @@ import { useUiStore } from '../../store/ui';
 import { BrandControls } from './BrandControls';
 import styles from './Header.module.css';
 
+const HOME_URL = import.meta.env.BASE_URL || '/';
+
 // The single drawer that hosts whichever panel is active; the panel/command
 // buttons point their aria-controls at it.
 const DRAWER_ID = 'app-drawer';
@@ -34,7 +36,14 @@ export function Header() {
 
   return (
     <header className={styles.header} data-testid="app-header">
-      <span className={styles.brand}>SpreadGL2</span>
+      <a
+        className={styles.brand}
+        href={HOME_URL}
+        aria-label="SpreadGL2 home"
+        data-testid="header-brand-link"
+      >
+        SpreadGL2
+      </a>
       <BrandControls />
 
       <div className={styles.spacer} />
@@ -161,7 +170,7 @@ export function Header() {
             onClick={() => toggle('export')}
           >
             <ExternalLink size={12} />
-            Export
+            <span className={styles.exportLabel}>Export</span>
           </button>
           <button
             type="button"

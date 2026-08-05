@@ -8,8 +8,8 @@
 }
 
 .iconBtn {
-  width: 32px;
-  height: 32px;
+  width: var(--control-size);
+  height: var(--control-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -1,0 +1,232 @@
+@import "../../styles/tokens.css";
+
+.scroll {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.shell {
+  display: grid;
+  width: min(1360px, calc(100% - clamp(32px, 6vw, 96px)));
+  margin: 0 auto auto;
+  padding-block: clamp(28px, 5vh, 55px);
+  column-gap: clamp(40px, 4vw, 72px);
+  grid-template-areas:
+    "intro intro"
+    "details action";
+  grid-template-columns: minmax(340px, 0.86fr) minmax(500px, 1.14fr);
+  row-gap: clamp(30px, 3.2vh, 38px);
+}
+
+.intro {
+  padding-bottom: clamp(16px, 3vh, 38px);
+  grid-area: intro;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 var(--space-2);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: var(--line-tight);
+}
+
+.subtitle {
+  margin: 0 auto;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-landingsubtitle);
+  line-height: 1.4;
+}
+
+.details {
+  align-self: start;
+  grid-area: details;
+}
+
+.description {
+  margin: 0 0 26px;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-landingcopy);
+  line-height: var(--line-body);
+}
+
+.detailsTitle {
+  margin: 0 0 14px;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-landingcopy);
+  font-weight: 600;
+  line-height: var(--line-ui);
+}
+
+.capabilities {
+  display: grid;
+  margin: 0 0 28px;
+  padding: 0;
+  gap: 10px;
+  list-style: none;
+}
+
+.capabilities li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-landingcopy);
+  line-height: var(--line-body);
+}
+
+.capabilities li::before {
+  position: absolute;
+  top: 0.6em;
+  left: 1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  content: "";
+}
+
+.privacy {
+  display: grid;
+  padding: var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--accent-translucent);
+  gap: var(--space-3);
+  grid-template-columns: 22px minmax(0, 1fr);
+}
+
+.privacyIcon {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  color: var(--accent);
+}
+
+.privacy h2 {
+  margin: 0 0 6px;
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-title);
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.privacy p {
+  margin: 0;
+  color: var(--fg-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-landingsecondary);
+  line-height: 1.5;
+}
+
+.inlineLink {
+  color: var(--fg-secondary);
+  text-decoration-color: var(--border-default);
+  text-underline-offset: 3px;
+}
+
+.inlineLink:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.supportLinks {
+  display: flex;
+  margin-top: 22px;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.supportLinks a,
+.resourceButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fg-secondary);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: var(--text-landingsecondary);
+  line-height: 1.4;
+  text-decoration-color: var(--border-default);
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+}
+
+.supportLinks a:hover,
+.resourceButton:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.actionPanel {
+  width: 100%;
+  align-self: center;
+  grid-area: action;
+}
+
+@media (max-width: 1599px) and (min-width: 1200px) {
+  .title {
+    font-size: var(--text-landingtitlemedium);
+  }
+
+  .subtitle {
+    font-size: var(--text-landingsubtitlemedium);
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 621px) {
+  .title {
+    font-size: var(--text-landingtitlecompact);
+  }
+
+  .subtitle {
+    font-size: var(--text-landingsubtitlecompact);
+  }
+}
+
+@media (max-width: 1024px) {
+  .shell {
+    width: min(700px, calc(100% - clamp(32px, 6vw, 64px)));
+    padding-block: clamp(24px, 4vh, 40px);
+    grid-template-areas:
+      "intro"
+      "action"
+      "details";
+    grid-template-columns: minmax(0, 700px);
+    justify-content: center;
+    row-gap: clamp(26px, 3vh, 32px);
+  }
+
+  .intro,
+  .details,
+  .actionPanel {
+    align-self: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .shell {
+    width: calc(100% - 32px);
+    padding-block: clamp(20px, 4vh, 32px);
+    row-gap: clamp(24px, 3vh, 28px);
+  }
+
+  .title {
+    margin-bottom: 7px;
+    font-size: var(--text-landingtitlemobile);
+  }
+
+  .subtitle {
+    max-width: 30ch;
+    font-size: var(--text-landingsubtitlemobile);
+  }
+}

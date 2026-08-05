@@ -15,74 +15,15 @@
   transition: width var(--dur-base) var(--ease-out);
 }
 
-/* Icon-only rail at 1024–1279px and below 1024px */
-@media (max-width: 1279px) {
-  .sidebar {
-    overflow-x: hidden;
-    overflow-y: hidden;
-    align-items: center;
-  }
-
-  .section {
-    width: 100%;
-    padding: var(--space-2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* Hide all text content in rail mode */
-  .sectionTitle,
-  .fileName,
-  .tipCount,
-  .projectTrait,
-  .replaceBtn,
-  .dataItem,
-  .traitNameRow,
-  .traitMeta,
-  .traitEmpty,
-  .legendHeader,
-  .legendTitleWrap,
-  .legendList,
-  .legendPlaceholder,
-  .legendGradientWrap,
-  .legendSubLabel {
-    display: none;
-  }
-
-  /* Show rail icon button that expands sidebar on click */
-  .railIcon {
-    display: flex;
-    width: 32px;
-    height: 32px;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md);
-    color: var(--fg-tertiary);
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    transition:
-      background var(--dur-fast) var(--ease-out),
-      color var(--dur-fast) var(--ease-out);
-  }
-
-  .railIcon:hover {
-    background: var(--bg-elevated);
-    color: var(--fg-primary);
-  }
-}
-
-/* Always hide rail icon at full width */
-@media (min-width: 1280px) {
+/* Hide the rail affordance while the full sidebar is visible. */
+@media (min-width: 960px) {
   .railIcon {
     display: none;
   }
 }
 
 .section {
-  padding: var(--space-4);
+  padding: clamp(var(--space-3), 1.2vw, var(--space-4));
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -558,4 +499,60 @@
 
 .legendDeselected {
   opacity: 0.35;
+}
+
+/* Keep this final so the rail visibility rules win over the base component styles. */
+@media (max-width: 959px) {
+  .sidebar {
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .section {
+    width: 100%;
+    padding: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sectionTitle,
+  .fileName,
+  .tipCount,
+  .projectTrait,
+  .replaceBtn,
+  .dataItem,
+  .traitNameRow,
+  .traitMeta,
+  .traitEmpty,
+  .legendHeader,
+  .legendTitleWrap,
+  .legendList,
+  .legendPlaceholder,
+  .legendGradientWrap,
+  .legendSubLabel {
+    display: none;
+  }
+
+  .railIcon {
+    width: var(--control-size);
+    height: var(--control-size);
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--fg-tertiary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+
+  .railIcon:hover {
+    background: var(--bg-elevated);
+    color: var(--fg-primary);
+  }
 }
