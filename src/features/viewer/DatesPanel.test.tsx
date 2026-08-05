@@ -200,10 +200,10 @@ describe('DatesPanel', () => {
 
   it('renders a colgroup and a resize handle per column', () => {
     render(<DatesPanel />);
-    const table = screen.getByTestId('dates-panel').querySelector('table');
-    const cols = table?.querySelectorAll('colgroup col');
-    expect(cols?.length).toBe(5);
-    expect((cols?.[0] as HTMLElement).style.width).toBe('150px');
+    const table = screen.getByTestId('dates-panel').querySelector('table') as HTMLTableElement;
+    const cols = table.querySelectorAll<HTMLElement>('colgroup col');
+    expect(cols.length).toBe(5);
+    expect(cols[0]?.style.width).toBe('150px');
     for (const col of ['taxon', 'substring', 'date', 'format', 'source']) {
       expect(screen.getByTestId(`dates-col-resize-${col}`)).toBeTruthy();
     }

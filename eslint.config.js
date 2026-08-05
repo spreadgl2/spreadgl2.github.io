@@ -43,16 +43,15 @@ export default [
         {
           default: "disallow",
           checkAllOrigins: true,
-          rules: [
+          policies: [
             {
-              from: { type: "phylo" },
-              allow: { to: { type: ["phylo", "format"] } },
+              from: { element: { type: "phylo" } },
+              allow: { to: { element: { type: ["phylo", "format"] } } },
             },
             ...FORBIDDEN_EXTERNALS.map((mod) => ({
-              from: { type: "phylo" },
+              from: { element: { type: "phylo" } },
               disallow: {
-                to: { origin: ["external", "core"] },
-                dependency: { module: mod },
+                to: { module: { origin: ["external", "core"], source: mod } },
               },
             })),
           ],

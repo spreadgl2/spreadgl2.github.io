@@ -28,18 +28,17 @@ describe('buildGlyphAtlas', () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
       mockCtx as unknown as CanvasRenderingContext2D,
     );
-    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
-      'data:image/png;base64,mock',
-    );
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('returns a data URL string from canvas.toDataURL', () => {
+  it('returns the canvas as a deck.gl texture source', () => {
     const atlas = buildGlyphAtlas();
-    expect(atlas.iconAtlas).toBe('data:image/png;base64,mock');
+    expect(atlas.iconAtlas).toBeInstanceOf(HTMLCanvasElement);
+    expect((atlas.iconAtlas as HTMLCanvasElement).width).toBe(ATLAS_CELL * ATLAS_GLYPHS.length);
+    expect((atlas.iconAtlas as HTMLCanvasElement).height).toBe(ATLAS_CELL);
   });
 
   it('iconMapping has an entry for all 4 glyph shapes', () => {
