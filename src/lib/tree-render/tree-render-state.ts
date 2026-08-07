@@ -127,6 +127,7 @@ export function computeDimmedNodeIds(
   highlightedBranchIds: number[] = [],
   suppressCladeDimming = false,
   playbackWindow?: TimeWindow | null,
+  rootTime?: number | null,
 ): {
   dimmedNodeIds: Set<string> | undefined;
   dimmedTipIds: Set<string> | undefined;
@@ -177,6 +178,7 @@ export function computeDimmedNodeIds(
         if (nodeId !== undefined) dimmed.add(nodeId);
       }
     } else if (storeIsPlaying) {
+      const activeWindow = playbackWindow === undefined ? storeWindow : playbackWindow;
       for (let i = 0; i < branchTable.count; i++) {
         const branchId = branchTable.branchId[i] ?? i;
         const startTime = branchTable.startTime[i] ?? 0;
@@ -184,13 +186,24 @@ export function computeDimmedNodeIds(
         const active = isActive(
           { startTime, endTime, branchId },
           playhead,
-          playbackWindow === undefined ? storeWindow : playbackWindow,
+          activeWindow,
           storeMode,
         );
         if (!active) {
           const nodeId = graph.nodes[branchId]?.origId;
           if (nodeId !== undefined) dimmed.add(nodeId);
         }
+      }
+
+      const root = rawLayout?.nodes.find((node) => node.parentId === null);
+      if (root && rootTime != null && Number.isFinite(rootTime)) {
+        const active = isActive(
+          { startTime: rootTime, endTime: rootTime, branchId: -1 },
+          playhead,
+          activeWindow,
+          storeMode,
+        );
+        if (!active) dimmed.add(root.id);
       }
     }
 

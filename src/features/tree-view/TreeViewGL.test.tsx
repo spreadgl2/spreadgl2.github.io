@@ -1908,29 +1908,40 @@ describe('TreeViewGL', () => {
     expect(bl?.updateTriggers?.getColor).toContain(75);
   });
 
-  it('root-stub: alpha honors treeOpacity and dim factor', () => {
+  it('root elbow and stub dim outside the Window without a root branch row', () => {
+    const calibTipA = { ...TIP_A_NODE, annotations: { date: '2015' } };
+    const calibTipB = { ...TIP_B_NODE, annotations: { date: '2015' } };
+    const calibLayout: Layout = {
+      ...MOCK_LAYOUT,
+      nodes: [ROOT_NODE, calibTipA, calibTipB],
+      nodeMap: new Map([
+        ['root', ROOT_NODE],
+        ['tip_a', calibTipA],
+        ['tip_b', calibTipB],
+      ]),
+    };
     const branchTable: BranchTable = {
       count: 2,
-      branchId: new Int32Array([0, 1]),
-      parentBranch: new Int32Array([-1, 0]),
-      isInternal: new Uint8Array([1, 0]),
-      startTime: new Float32Array([2010.0, 2010.0]),
-      endTime: new Float32Array([2020.0, 2020.0]),
+      branchId: new Int32Array([1, 2]),
+      parentBranch: new Int32Array([-1, -1]),
+      isInternal: new Uint8Array([0, 0]),
+      startTime: new Float32Array([2013.0, 2013.0]),
+      endTime: new Float32Array([2015.0, 2015.0]),
       startLat: new Float32Array([0, 0]),
       startLon: new Float32Array([0, 0]),
       endLat: new Float32Array([0, 0]),
       endLon: new Float32Array([0, 0]),
       stateWeight: new Float32Array([1, 1]),
     };
-    useTreeStore.setState({ layout: MOCK_LAYOUT, graph: MOCK_GRAPH, branchTable });
-    // playhead before branches start → Trail mode → root node dimmed
+    useTreeStore.setState({ layout: calibLayout, graph: MOCK_GRAPH, branchTable });
     useTimelineStore.setState({
-      playhead: 2009.0,
+      playhead: 2015.0,
       isPlaying: true,
-      mode: 'Trail',
+      mode: 'Window',
       clade: false,
       subtreeRootId: null,
-      window: null,
+      window: { start: 2014.0, end: 2015.0 },
+      windowSize: 1,
       bounds: null,
       speed: 1,
       arcs: false,
@@ -1950,16 +1961,26 @@ describe('TreeViewGL', () => {
       render(<TreeViewGL />);
     });
 
+    const elbows = (
+      capturedLayers as {
+        id: string;
+        getColor?: (d: { branchId: string }) => number[];
+      }[]
+    ).find((l) => l.id === 'elbows');
     const sl = (
       capturedLayers as {
         id: string;
         getColor?: (d: { nodeId: string }) => number[];
       }[]
     ).find((l) => l.id === 'root-stub');
+    expect(elbows).toBeDefined();
     expect(sl).toBeDefined();
+    if (elbows?.getColor) {
+      const color = elbows.getColor({ branchId: 'root' });
+      expect(color[3]).toBe(Math.round(200 * 0.05 * 0.5));
+    }
     if (sl?.getColor) {
       const color = sl.getColor({ nodeId: 'root' });
-      // dimmed: 0.05 × opacity: 0.5 → Math.round(200 * 0.05 * 0.5) = 5
       expect(color[3]).toBe(Math.round(200 * 0.05 * 0.5));
     }
   });

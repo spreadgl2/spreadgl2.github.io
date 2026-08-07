@@ -346,6 +346,21 @@ export function useTreeGlDeckModel() {
     ],
   );
 
+  const calibration = useMemo(() => {
+    if (!layout) return null;
+    const cal = new TreeCalibration();
+    cal.setAnchor('date', layout.nodeMap, layout.maxX);
+    return cal;
+  }, [layout]);
+
+  const rootTime = useMemo(() => {
+    if (!calibration?.active || !layout) return null;
+    const root = layout.nodes.find((node) => node.parentId === null);
+    if (!root) return null;
+    const time = calibration.heightToDecYear(layout.maxX - root.x);
+    return Number.isFinite(time) ? time : null;
+  }, [calibration, layout]);
+
   const playheadBucket = useMemo(
     () =>
       getDimPlayheadBucket(
@@ -377,6 +392,7 @@ export function useTreeGlDeckModel() {
       highlightedBranchIds,
       shiftPeek,
       dimWindow,
+      rootTime,
     );
   }, [
     playheadBucket,
@@ -395,19 +411,13 @@ export function useTreeGlDeckModel() {
     colorByTrait,
     focusedTaxa,
     highlightedBranchIds,
+    rootTime,
   ]);
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     (globalThis as unknown as Record<string, unknown>).__treeDimmedCount = dimmedNodeIds?.size ?? 0;
   }, [dimmedNodeIds]);
-
-  const calibration = useMemo(() => {
-    if (!layout) return null;
-    const cal = new TreeCalibration();
-    cal.setAnchor('date', layout.nodeMap, layout.maxX);
-    return cal;
-  }, [layout]);
 
   const glyphAtlas = useMemo(() => buildGlyphAtlas(), []);
 
