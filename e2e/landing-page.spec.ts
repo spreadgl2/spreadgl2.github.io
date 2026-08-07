@@ -5,7 +5,7 @@ test.describe('Landing page', () => {
     await page.addInitScript(() => localStorage.clear());
   });
 
-  test('presents the product, import actions, examples, citation, and credits on desktop', async ({
+  test('presents the product, import actions, examples, and About resources on desktop', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 2048, height: 1185 });
@@ -34,8 +34,8 @@ test.describe('Landing page', () => {
     expect(title).toBeTruthy();
     expect(subtitle).toBeTruthy();
     expect(shell!.width).toBeGreaterThanOrEqual(1_350);
-    expect(title!.y).toBeGreaterThanOrEqual(100);
-    expect(title!.y).toBeLessThanOrEqual(120);
+    expect(title!.y).toBeGreaterThanOrEqual(90);
+    expect(title!.y).toBeLessThanOrEqual(105);
     expect(action!.y - (subtitle!.y + subtitle!.height)).toBeGreaterThanOrEqual(48);
     expect(details!.x).toBeLessThan(action!.x);
     expect(
@@ -43,20 +43,22 @@ test.describe('Landing page', () => {
         (element) => element.scrollWidth <= element.clientWidth,
       ),
     ).toBe(true);
+    const verticalOverflow = await page
+      .locator('[data-testid="landing-page"]')
+      .evaluate((element) => element.scrollHeight - element.clientHeight);
+    expect(verticalOverflow).toBeLessThanOrEqual(0);
 
-    const citationTrigger = page.locator('[data-testid="landing-citation-btn"]');
-    await citationTrigger.click();
-    await expect(page.locator('[data-testid="citation-modal"]')).toBeVisible();
-    await expect(page.locator('[data-testid="citation-text"]')).toContainText('Hong SL et al.');
-    await page.locator('[data-testid="citation-close-btn"]').click();
-    await expect(citationTrigger).toBeFocused();
-
-    await page.locator('[data-testid="landing-credits-btn"]').click();
+    await expect(page.locator('[data-testid="landing-citation-btn"]')).toHaveCount(0);
+    const aboutTrigger = page.locator('[data-testid="landing-about-btn"]');
+    await aboutTrigger.click();
     await expect(page.locator('[data-testid="about-modal"]')).toBeVisible();
+    await expect(page.locator('[data-testid="citation-text"]')).toContainText('Hong SL et al.');
     await expect(page.getByRole('link', { name: 'Samuel L. Hong' })).toHaveAttribute(
       'href',
       'https://orcid.org/0000-0001-6354-4943',
     );
+    await page.locator('[data-testid="about-close-btn"]').click();
+    await expect(aboutTrigger).toBeFocused();
   });
 
   test('stacks the import actions before details without horizontal overflow on mobile', async ({
@@ -107,5 +109,20 @@ test.describe('Landing page', () => {
     expect(compactDetails).toBeTruthy();
     expect(compactAction).toBeTruthy();
     expect(compactAction!.y).toBeLessThan(compactDetails!.y);
+  });
+
+  test('fits without vertical scrolling on standard desktop viewports', async ({ page }) => {
+    for (const viewport of [
+      { width: 1600, height: 1000 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/');
+
+      const verticalOverflow = await page
+        .locator('[data-testid="landing-page"]')
+        .evaluate((element) => element.scrollHeight - element.clientHeight);
+      expect(verticalOverflow).toBeLessThanOrEqual(0);
+    }
   });
 });

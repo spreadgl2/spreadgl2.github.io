@@ -301,3 +301,84 @@ describe('computeTreeRenderState clade subtree dimming', () => {
     expect(dimmedNodeIds).toBeUndefined();
   });
 });
+
+describe('computeDimmedNodeIds root playback dimming', () => {
+  function setUpRootWithoutBranchRow() {
+    const graph = makeMinimalGraph(3);
+    const root: Layout['nodes'][number] = {
+      id: 'n0',
+      x: 0,
+      y: 0.5,
+      isTip: false,
+      parentId: null,
+      children: ['n1', 'n2'],
+      annotations: {},
+    };
+    const tipA: Layout['nodes'][number] = {
+      id: 'n1',
+      x: 2,
+      y: 0,
+      isTip: true,
+      parentId: 'n0',
+      children: [],
+      annotations: {},
+    };
+    const tipB: Layout['nodes'][number] = {
+      id: 'n2',
+      x: 2,
+      y: 1,
+      isTip: true,
+      parentId: 'n0',
+      children: [],
+      annotations: {},
+    };
+    const layout: Layout = {
+      nodes: [root, tipA, tipB],
+      nodeMap: new Map([
+        ['n0', root],
+        ['n1', tipA],
+        ['n2', tipB],
+      ]),
+      maxX: 2,
+      maxY: 1,
+      xAxisMode: 'date',
+    };
+    const branchTable: BranchTable = {
+      count: 2,
+      branchId: new Int32Array([1, 2]),
+      parentBranch: new Int32Array([-1, -1]),
+      isInternal: new Uint8Array([0, 0]),
+      startTime: new Float32Array([2013, 2013]),
+      endTime: new Float32Array([2015, 2015]),
+      startLat: new Float32Array(2),
+      startLon: new Float32Array(2),
+      endLat: new Float32Array(2),
+      endLon: new Float32Array(2),
+      stateWeight: new Float32Array(2).fill(1),
+    };
+    useTreeStore.setState({ graph, layout, branchTable });
+    return layout;
+  }
+
+  it('dims the parentless root after the Window moves past its date', () => {
+    const layout = setUpRootWithoutBranchRow();
+    const window = { start: 2014, end: 2015 };
+    useTimelineStore.setState({ isPlaying: true, mode: 'Window', window });
+
+    const { dimmedNodeIds } = computeDimmedNodeIds(2015, [], layout, [], false, window, 2013);
+
+    expect(dimmedNodeIds?.has('n0')).toBe(true);
+    expect(dimmedNodeIds?.has('n1')).toBe(false);
+    expect(dimmedNodeIds?.has('n2')).toBe(false);
+  });
+
+  it('keeps the parentless root lit while its date is inside the Window', () => {
+    const layout = setUpRootWithoutBranchRow();
+    const window = { start: 2012, end: 2014 };
+    useTimelineStore.setState({ isPlaying: true, mode: 'Window', window });
+
+    const { dimmedNodeIds } = computeDimmedNodeIds(2014, [], layout, [], false, window, 2013);
+
+    expect(dimmedNodeIds?.has('n0') ?? false).toBe(false);
+  });
+});
