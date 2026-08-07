@@ -248,8 +248,8 @@ describe('Loader', () => {
     ).toBeTruthy();
     expect(screen.getByText(/SpreadGL2 uses/)).toBeTruthy();
     expect(screen.getByText('Your research data stays on your device')).toBeTruthy();
-    expect(screen.getByTestId('landing-citation-btn')).toBeTruthy();
-    expect(screen.getByTestId('landing-credits-btn')).toBeTruthy();
+    expect(screen.queryByTestId('landing-citation-btn')).toBeNull();
+    expect(screen.getByTestId('landing-about-btn')).toBeTruthy();
   });
 
   it('renders PEDV example button after manifest loads', async () => {

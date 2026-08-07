@@ -5,7 +5,7 @@ test.describe('Landing page', () => {
     await page.addInitScript(() => localStorage.clear());
   });
 
-  test('presents the product, import actions, examples, citation, and credits on desktop', async ({
+  test('presents the product, import actions, examples, and About resources on desktop', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 2048, height: 1185 });
@@ -44,19 +44,17 @@ test.describe('Landing page', () => {
       ),
     ).toBe(true);
 
-    const citationTrigger = page.locator('[data-testid="landing-citation-btn"]');
-    await citationTrigger.click();
-    await expect(page.locator('[data-testid="citation-modal"]')).toBeVisible();
-    await expect(page.locator('[data-testid="citation-text"]')).toContainText('Hong SL et al.');
-    await page.locator('[data-testid="citation-close-btn"]').click();
-    await expect(citationTrigger).toBeFocused();
-
-    await page.locator('[data-testid="landing-credits-btn"]').click();
+    await expect(page.locator('[data-testid="landing-citation-btn"]')).toHaveCount(0);
+    const aboutTrigger = page.locator('[data-testid="landing-about-btn"]');
+    await aboutTrigger.click();
     await expect(page.locator('[data-testid="about-modal"]')).toBeVisible();
+    await expect(page.locator('[data-testid="citation-text"]')).toContainText('Hong SL et al.');
     await expect(page.getByRole('link', { name: 'Samuel L. Hong' })).toHaveAttribute(
       'href',
       'https://orcid.org/0000-0001-6354-4943',
     );
+    await page.locator('[data-testid="about-close-btn"]').click();
+    await expect(aboutTrigger).toBeFocused();
   });
 
   test('stacks the import actions before details without horizontal overflow on mobile', async ({
