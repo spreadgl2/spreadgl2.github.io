@@ -59,7 +59,10 @@ export function LandingPage({ action }: LandingPageProps) {
               Lineage-through-time curves, migration transition counts, and BSSVS Bayes factors
             </li>
             <li>GeoJSON boundaries, choropleths with environmental data, and raster overlays</li>
-            <li>Built-in gazetteer with automatic location matching and interactive coordinate assignment</li>
+            <li>
+              Built-in gazetteer with automatic location matching and interactive coordinate
+              assignment
+            </li>
           </ul>
 
           <aside className={styles.privacy} aria-labelledby="privacy-title">

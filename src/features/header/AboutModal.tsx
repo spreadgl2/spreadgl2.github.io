@@ -82,8 +82,8 @@ export function AboutModal({ onClose }: { onClose: () => void }) {
           </p>
           <p>
             SpreadGL2 is a complete rewrite of{' '}
-            <InlineLink href={SPREADGL_PAPER_URL}>Spread.gl</InlineLink>, retaining and expanding its 
-            features while using a new rendering and application architecture.
+            <InlineLink href={SPREADGL_PAPER_URL}>Spread.gl</InlineLink>, retaining and expanding
+            its features while using a new rendering and application architecture.
           </p>
           <p>
             Tree parsing, graph construction, layout, date calibration, and selected palette

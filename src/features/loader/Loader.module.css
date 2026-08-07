@@ -17,7 +17,7 @@
   /*height: clamp(210px, 24vh, 240px);*/
   height: clamp(250px, calc(24vh + 40px), 280px);
   margin-top: -40px;
-  
+
   padding: var(--space-6);
   box-sizing: border-box;
   border: 2px solid var(--border-default);
