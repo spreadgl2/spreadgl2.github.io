@@ -34,8 +34,8 @@ test.describe('Landing page', () => {
     expect(title).toBeTruthy();
     expect(subtitle).toBeTruthy();
     expect(shell!.width).toBeGreaterThanOrEqual(1_350);
-    expect(title!.y).toBeGreaterThanOrEqual(100);
-    expect(title!.y).toBeLessThanOrEqual(120);
+    expect(title!.y).toBeGreaterThanOrEqual(90);
+    expect(title!.y).toBeLessThanOrEqual(105);
     expect(action!.y - (subtitle!.y + subtitle!.height)).toBeGreaterThanOrEqual(48);
     expect(details!.x).toBeLessThan(action!.x);
     expect(
@@ -43,6 +43,10 @@ test.describe('Landing page', () => {
         (element) => element.scrollWidth <= element.clientWidth,
       ),
     ).toBe(true);
+    const verticalOverflow = await page
+      .locator('[data-testid="landing-page"]')
+      .evaluate((element) => element.scrollHeight - element.clientHeight);
+    expect(verticalOverflow).toBeLessThanOrEqual(0);
 
     await expect(page.locator('[data-testid="landing-citation-btn"]')).toHaveCount(0);
     const aboutTrigger = page.locator('[data-testid="landing-about-btn"]');
@@ -105,5 +109,20 @@ test.describe('Landing page', () => {
     expect(compactDetails).toBeTruthy();
     expect(compactAction).toBeTruthy();
     expect(compactAction!.y).toBeLessThan(compactDetails!.y);
+  });
+
+  test('fits without vertical scrolling on standard desktop viewports', async ({ page }) => {
+    for (const viewport of [
+      { width: 1600, height: 1000 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/');
+
+      const verticalOverflow = await page
+        .locator('[data-testid="landing-page"]')
+        .evaluate((element) => element.scrollHeight - element.clientHeight);
+      expect(verticalOverflow).toBeLessThanOrEqual(0);
+    }
   });
 });
