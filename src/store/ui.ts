@@ -225,7 +225,7 @@ export const useUiStore = create<UiStore>((set) => ({
   paletteReverse: false,
   showBranches: true,
   branchWidth: 1.5,
-  arcWidth: 20,
+  arcWidth: 35,
   showTips: true,
   tipRadius: 2.5,
   treeOpacity: 100,
