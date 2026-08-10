@@ -1,5 +1,5 @@
+import { MapView as DeckMapView, type Layer, OrthographicView } from '@deck.gl/core';
 import { DeckGL } from '@deck.gl/react';
-import { MapView as DeckMapView, type Layer, OrthographicView } from 'deck.gl';
 import { ArrowDownNarrowWide, ArrowUpNarrowWide, Home, ScanSearch } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
+
+import { WebMercatorViewport } from '@deck.gl/core';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { WebMercatorViewport } from 'deck.gl';
 import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildHpdRenderData, buildMultiHpdRenderData } from '../../lib/geo/hpd-render-data';
@@ -76,7 +77,7 @@ vi.mock('react-map-gl/maplibre', () => ({
   },
 }));
 
-vi.mock('@deck.gl/geo-layers', () => ({
+vi.mock('./TripsLayer', () => ({
   TripsLayer: class TripsLayer {
     constructor(props: Record<string, unknown>) {
       Object.assign(this, props);
@@ -105,50 +106,38 @@ vi.mock('@deck.gl/layers', () => ({
       Object.assign(this, props);
     }
   },
+  BitmapLayer: class BitmapLayer {
+    constructor(props: Record<string, unknown>) {
+      Object.assign(this, props);
+    }
+  },
+  PathLayer: class PathLayer {
+    constructor(props: Record<string, unknown>) {
+      Object.assign(this, props);
+    }
+  },
+  ScatterplotLayer: class ScatterplotLayer {
+    constructor(props: Record<string, unknown>) {
+      Object.assign(this, props);
+    }
+  },
+  TextLayer: class TextLayer {
+    constructor(props: Record<string, unknown>) {
+      Object.assign(this, props);
+    }
+  },
+  GeoJsonLayer: class GeoJsonLayer {
+    constructor(props: Record<string, unknown>) {
+      Object.assign(this, props);
+    }
+  },
 }));
 
-// deck.gl is a barrel re-exporting from @deck.gl/layers. Mock it directly to
-// ensure PolygonLayer, ArcLayer etc. from the `deck.gl` import path use our
-// test stubs (Vitest doesn't always chain mocks through re-exports).
-vi.mock('deck.gl', async () => {
-  const { WebMercatorViewport } = await vi.importActual<typeof import('deck.gl')>('deck.gl');
-  return {
-    WebMercatorViewport,
-    ArcLayer: class ArcLayer {
-      constructor(props: Record<string, unknown>) {
-        Object.assign(this, props);
-      }
-    },
-    BitmapLayer: class BitmapLayer {
-      constructor(props: Record<string, unknown>) {
-        Object.assign(this, props);
-      }
-    },
-    PolygonLayer: class PolygonLayer {
-      constructor(props: Record<string, unknown>) {
-        Object.assign(this, props);
-      }
-    },
-    ScatterplotLayer: class ScatterplotLayer {
-      constructor(props: Record<string, unknown>) {
-        Object.assign(this, props);
-      }
-    },
-    TextLayer: class TextLayer {
-      constructor(props: Record<string, unknown>) {
-        Object.assign(this, props);
-      }
-    },
-    GeoJsonLayer: class GeoJsonLayer {
-      constructor(props: Record<string, unknown>) {
-        Object.assign(this, props);
-      }
-    },
-    Layer: class Layer {},
-  };
+vi.mock('@deck.gl/core', async () => {
+  const { WebMercatorViewport } =
+    await vi.importActual<typeof import('@deck.gl/core')>('@deck.gl/core');
+  return { WebMercatorViewport };
 });
-
-vi.mock('@deck.gl/core', () => ({}));
 
 // maplibre-gl CSS import stub
 vi.mock('maplibre-gl/dist/maplibre-gl.css', () => ({}));

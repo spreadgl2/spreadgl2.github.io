@@ -1,17 +1,15 @@
+import { type Layer, WebMercatorViewport } from '@deck.gl/core';
 import { DataFilterExtension } from '@deck.gl/extensions';
-import { TripsLayer } from '@deck.gl/geo-layers';
-import { DeckGL } from '@deck.gl/react';
 import {
   ArcLayer,
   BitmapLayer,
   GeoJsonLayer,
-  type Layer,
   PathLayer,
   PolygonLayer,
   ScatterplotLayer,
   TextLayer,
-  WebMercatorViewport,
-} from 'deck.gl';
+} from '@deck.gl/layers';
+import { DeckGL } from '@deck.gl/react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
@@ -51,6 +49,7 @@ import {
 import { branchOpacitySliderToLayerOpacity } from './branch-opacity';
 import { EnvLegendOverlay } from './EnvLegendOverlay';
 import { computeLassoTaxa, LassoTool } from './LassoTool';
+import { TripsLayer } from './TripsLayer';
 
 interface ViewState {
   longitude: number;

@@ -32,13 +32,16 @@ vi.mock('@deck.gl/react', () => ({
   },
 }));
 
-vi.mock('deck.gl', () => ({
+vi.mock('@deck.gl/core', () => ({
   COORDINATE_SYSTEM: { CARTESIAN: 0 },
   OrthographicView: class OrthographicView {
     constructor(props: Record<string, unknown>) {
       Object.assign(this, props);
     }
   },
+}));
+
+vi.mock('@deck.gl/layers', () => ({
   LineLayer: class LineLayer {
     constructor(props: Record<string, unknown>) {
       Object.assign(this, props);
