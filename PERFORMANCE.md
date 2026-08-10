@@ -52,7 +52,11 @@ main-thread rehydration budget for B.1.1.7.
 
 The browser suite also reports the largest cold frame separately and verifies
 that the constrained DPR 2 profile renders the deck.gl canvas at 1x. The stress
-workflow runs weekly, on version tags, and on explicit dispatch.
+workflow runs weekly, on version tags, and on explicit dispatch. Weekly browser
+measurements are non-blocking because GitHub-hosted software-rendering capacity
+is not fixed; version-tag runs and explicitly requested browser runs enforce the
+budgets. The deterministic parser and rehydration budget remains blocking on
+every workflow trigger.
 
 ## Physical Validation Protocol
 

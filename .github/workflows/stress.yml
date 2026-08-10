@@ -39,6 +39,10 @@ jobs:
   e2e-perf:
     name: playwright frame-time budgets
     if: github.event_name != 'workflow_dispatch' || inputs.run_e2e_perf
+    # Hosted-runner software rendering is not a stable performance baseline.
+    # Preserve the weekly measurements without turning host contention into a
+    # failing workflow; tag and explicitly requested runs remain blocking.
+    continue-on-error: ${{ github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

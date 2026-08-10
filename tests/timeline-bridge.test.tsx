@@ -23,7 +23,7 @@ vi.mock('react-map-gl/maplibre', () => ({
   Map: () => <div />,
 }));
 
-vi.mock('@deck.gl/geo-layers', () => ({
+vi.mock('../src/features/map-view/TripsLayer', () => ({
   TripsLayer: class TripsLayer {
     currentTime: number;
     id: string;

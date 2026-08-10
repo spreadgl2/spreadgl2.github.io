@@ -28,8 +28,9 @@
     "tauri:build": "tauri build"
   },
   "dependencies": {
+    "@deck.gl/core": "^9.3.7",
     "@deck.gl/extensions": "^9.3.7",
-    "@deck.gl/geo-layers": "^9.3.7",
+    "@deck.gl/layers": "^9.3.7",
     "@deck.gl/react": "^9.3.7",
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.7.2",
@@ -37,7 +38,6 @@
     "@tauri-apps/plugin-opener": "^2.5.4",
     "@tauri-apps/plugin-store": "^2.4.4",
     "comlink": "^4.4.2",
-    "deck.gl": "^9.3.7",
     "geotiff": "^3.0.5",
     "idb-keyval": "^6.3.0",
     "lucide-react": "^1.28.0",

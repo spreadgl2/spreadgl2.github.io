@@ -1,4 +1,4 @@
-import type { TextureSource } from 'deck.gl';
+import type { TextureSource } from '@deck.gl/core';
 import { TIP_GLYPHS, type TipGlyph, traceTipGlyphPath } from './glyphs.js';
 
 export const ATLAS_CELL = 64;

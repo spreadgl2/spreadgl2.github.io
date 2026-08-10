@@ -24,8 +24,12 @@ SpreadGL2 additions.
 
 `src/lib/phylo/introspect.ts`, `annotate.ts`, and `slice.ts` are original SpreadGL2
 implementations informed by the peartree graph model. The deck.gl renderer, map,
-animation, analysis, interface, exports, workers, and Tauri integration are also
-original SpreadGL2 implementations.
+analysis, interface, exports, workers, and Tauri integration are otherwise original
+SpreadGL2 implementations.
+
+`src/features/map-view/TripsLayer.ts` is adapted from deck.gl 9.3.7's `TripsLayer`.
+deck.gl is © vis.gl contributors and distributed under the MIT license. The upstream
+license is reproduced in `LICENSES/deck.gl.txt`.
 
 SpreadGL2 includes the first 64 colors from Colorcet 3.2.1's `glasbey_light`
 and `glasbey_dark` palettes, exposed as static tree-render categorical palettes.

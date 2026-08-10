@@ -47,7 +47,7 @@ vi.mock('@deck.gl/react', () => ({
   },
 }));
 
-vi.mock('deck.gl', () => ({
+vi.mock('@deck.gl/core', () => ({
   MapView: class MockMapView {
     props: Record<string, unknown>;
     constructor(props: Record<string, unknown>) {

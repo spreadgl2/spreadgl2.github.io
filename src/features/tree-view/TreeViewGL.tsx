@@ -1,13 +1,12 @@
-import { DeckGL } from '@deck.gl/react';
+import { COORDINATE_SYSTEM, OrthographicView } from '@deck.gl/core';
 import {
-  COORDINATE_SYSTEM,
   IconLayer,
   type IconLayerProps,
   LineLayer,
-  OrthographicView,
   ScatterplotLayer,
   SolidPolygonLayer,
-} from 'deck.gl';
+} from '@deck.gl/layers';
+import { DeckGL } from '@deck.gl/react';
 import { ArrowDownNarrowWide, ArrowUpNarrowWide, Home, ScanSearch, X } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
