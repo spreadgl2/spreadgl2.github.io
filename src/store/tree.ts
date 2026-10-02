@@ -1,5 +1,6 @@
 import type { FeatureCollection } from 'geojson';
 import { create } from 'zustand';
+import type { AxisOrder } from '../lib/format/geojson-axis';
 import type { TipDateRow } from '../lib/format/tip-date-table';
 import {
   buildHpdRenderData,
@@ -26,7 +27,10 @@ export type GeoSource = 'gazetteer' | 'csv' | 'manual';
 export interface CustomOverlay {
   id: string;
   name: string;
+  /** Always longitude-first; see axisOrder for how the source file was written. */
   data: FeatureCollection;
+  /** Coordinate order of the source file; absent means longitude-first. */
+  axisOrder?: AxisOrder;
 }
 
 export interface ChoroplethOverlay {
@@ -94,6 +98,8 @@ export interface TreeStore {
   updateGeoEntry: (name: string, lat: number, lon: number) => void;
   addCustomOverlay: (overlay: CustomOverlay) => void;
   addChoroplethOverlay: (overlay: ChoroplethOverlay) => void;
+  updateCustomOverlay: (id: string, patch: Partial<Omit<CustomOverlay, 'id'>>) => void;
+  removeCustomOverlay: (id: string) => void;
   clearCustomOverlays: () => void;
   clearChoroplethOverlays: () => void;
   setLogTable: (table: LogTable, fileName: string) => void;
@@ -199,6 +205,24 @@ export const useTreeStore = create<TreeStore>((set) => ({
     }),
   addChoroplethOverlay: (overlay) =>
     set((state) => ({ choroplethOverlays: [...state.choroplethOverlays, overlay] })),
+  updateCustomOverlay: (id, patch) =>
+    set((state) => {
+      const current = state.customOverlays.find((o) => o.id === id);
+      if (!current) return {};
+      const next = { ...current, ...patch };
+      return {
+        customOverlays: state.customOverlays.map((o) => (o.id === id ? next : o)),
+        // Region data joined to this boundary shares its FeatureCollection.
+        choroplethOverlays:
+          patch.data === undefined
+            ? state.choroplethOverlays
+            : state.choroplethOverlays.map((o) =>
+                o.data === current.data ? { ...o, data: next.data } : o,
+              ),
+      };
+    }),
+  removeCustomOverlay: (id) =>
+    set((state) => ({ customOverlays: state.customOverlays.filter((o) => o.id !== id) })),
   clearCustomOverlays: () => set({ customOverlays: [] }),
   clearChoroplethOverlays: () => set({ choroplethOverlays: [] }),
   setLogTable: (table, fileName) =>

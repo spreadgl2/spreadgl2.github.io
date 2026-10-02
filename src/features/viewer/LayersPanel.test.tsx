@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useEnvStore } from '../../store/env';
 import { useRasterStore } from '../../store/raster';
@@ -96,6 +96,163 @@ describe('LayersPanel', () => {
     render(<LayersPanel />);
     expect(screen.getByTestId('add-overlay-btn')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Add boundaries (GeoJSON)' })).toBeTruthy();
+  });
+
+  it('asks for the coordinate order before adding an uploaded GeoJSON boundary', async () => {
+    render(<LayersPanel />);
+    const geojson = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: { name: 'Beijing' },
+          geometry: { type: 'Point', coordinates: [39.9, 116.4] },
+        },
+      ],
+    });
+    const file = new File([geojson], 'regions.geojson', { type: 'application/geo+json' });
+    fireEvent.change(screen.getByTestId('overlay-file-input'), { target: { files: [file] } });
+
+    expect(await screen.findByTestId('geojson-axis-modal')).toBeTruthy();
+    expect(useTreeStore.getState().customOverlays).toHaveLength(0);
+    expect((screen.getByTestId('geojson-axis-position-1') as HTMLSelectElement).value).toBe(
+      'latitude',
+    );
+
+    fireEvent.click(screen.getByTestId('geojson-axis-confirm'));
+    await waitFor(() => expect(screen.queryByTestId('geojson-axis-modal')).toBeNull());
+    const [overlay] = useTreeStore.getState().customOverlays;
+    expect(overlay?.name).toBe('regions');
+    expect(overlay?.axisOrder).toBe('lat-lon');
+    expect(overlay?.data.features[0]?.geometry).toEqual({
+      type: 'Point',
+      coordinates: [116.4, 39.9],
+    });
+  });
+
+  it('gear icon reopens the coordinate dialog and re-applies a new order', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        {
+          id: 'ov-1',
+          name: 'regions',
+          axisOrder: 'lon-lat',
+          data: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: { type: 'Point', coordinates: [20, 10] },
+              },
+            ],
+          },
+        },
+      ],
+    });
+    render(<LayersPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Coordinate order for regions' }));
+    expect(screen.getByTestId('geojson-axis-modal')).toBeTruthy();
+    expect((screen.getByTestId('geojson-axis-position-1') as HTMLSelectElement).value).toBe(
+      'longitude',
+    );
+    expect(screen.getByTestId('geojson-axis-confirm').textContent).toBe('Apply');
+
+    fireEvent.change(screen.getByTestId('geojson-axis-position-1'), {
+      target: { value: 'latitude' },
+    });
+    fireEvent.click(screen.getByTestId('geojson-axis-confirm'));
+
+    expect(screen.queryByTestId('geojson-axis-modal')).toBeNull();
+    const [overlay] = useTreeStore.getState().customOverlays;
+    expect(overlay?.id).toBe('ov-1');
+    expect(overlay?.axisOrder).toBe('lat-lon');
+    expect(overlay?.data.features[0]?.geometry).toEqual({ type: 'Point', coordinates: [10, 20] });
+  });
+
+  it('shows the source file order when re-editing a latitude-first boundary', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        {
+          id: 'ov-1',
+          name: 'regions',
+          axisOrder: 'lat-lon',
+          data: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: { type: 'Point', coordinates: [116.4, 39.9] },
+              },
+            ],
+          },
+        },
+      ],
+    });
+    render(<LayersPanel />);
+    fireEvent.click(screen.getByTestId('boundary-axis-btn-ov-1'));
+
+    expect(screen.getByText('[39.9000, 116.4000]')).toBeTruthy();
+    expect((screen.getByTestId('geojson-axis-position-1') as HTMLSelectElement).value).toBe(
+      'latitude',
+    );
+    fireEvent.click(screen.getByTestId('geojson-axis-cancel'));
+    expect(useTreeStore.getState().customOverlays[0]?.axisOrder).toBe('lat-lon');
+  });
+
+  it('gear icon does not toggle boundary visibility', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'ov-1', name: 'regions', data: { type: 'FeatureCollection', features: [] } },
+      ],
+    });
+    render(<LayersPanel />);
+    const toggle = screen.getByTestId('layer-toggle-ov-1') as HTMLInputElement;
+    expect(toggle.checked).toBe(true);
+    fireEvent.click(screen.getByTestId('boundary-axis-btn-ov-1'));
+    expect(toggle.checked).toBe(true);
+  });
+
+  it('trash icon removes only that boundary and leaves the others', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'ov-1', name: 'provinces', data: { type: 'FeatureCollection', features: [] } },
+        { id: 'ov-2', name: 'districts', data: { type: 'FeatureCollection', features: [] } },
+      ],
+    });
+    render(<LayersPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove provinces' }));
+
+    expect(useTreeStore.getState().customOverlays.map((o) => o.id)).toEqual(['ov-2']);
+    expect(screen.queryByTestId('layer-card-ov-1')).toBeNull();
+    expect(screen.getByTestId('layer-card-ov-2')).toBeTruthy();
+    expect(screen.getByTestId('clear-boundary-btn')).toBeTruthy();
+  });
+
+  it('removing the last boundary hides Clear Data', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'ov-1', name: 'provinces', data: { type: 'FeatureCollection', features: [] } },
+      ],
+    });
+    render(<LayersPanel />);
+    fireEvent.click(screen.getByTestId('boundary-remove-btn-ov-1'));
+    expect(useTreeStore.getState().customOverlays).toHaveLength(0);
+    expect(screen.queryByTestId('clear-boundary-btn')).toBeNull();
+  });
+
+  it('adds nothing when the coordinate order dialog is cancelled', async () => {
+    render(<LayersPanel />);
+    const geojson = JSON.stringify({ type: 'FeatureCollection', features: [] });
+    const file = new File([geojson], 'empty.geojson', { type: 'application/geo+json' });
+    fireEvent.change(screen.getByTestId('overlay-file-input'), { target: { files: [file] } });
+
+    fireEvent.click(await screen.findByTestId('geojson-axis-cancel'));
+    expect(screen.queryByTestId('geojson-axis-modal')).toBeNull();
+    expect(useTreeStore.getState().customOverlays).toHaveLength(0);
   });
 
   it('enables region data import only after boundaries are loaded', () => {

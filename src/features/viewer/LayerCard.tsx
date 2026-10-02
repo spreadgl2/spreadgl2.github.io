@@ -11,6 +11,7 @@ export function LayerCard({
   onCheckedChange,
   checkboxTestId,
   cardTestId,
+  actions,
   children,
 }: {
   title: string;
@@ -18,23 +19,56 @@ export function LayerCard({
   onCheckedChange: (checked: boolean) => void;
   checkboxTestId?: string;
   cardTestId?: string;
+  /** Icon buttons at the right of the header, outside the checkbox label. */
+  actions?: ReactNode;
   children?: ReactNode;
 }) {
   return (
     <div className={styles.card} data-testid={cardTestId}>
-      <label className={styles.header}>
-        <input
-          type="checkbox"
-          checked={checked}
-          data-testid={checkboxTestId}
-          onChange={(e) => onCheckedChange(e.target.checked)}
-        />
-        <span className={styles.title}>{title}</span>
-      </label>
+      <div className={styles.headerRow}>
+        <label className={styles.header}>
+          <input
+            type="checkbox"
+            checked={checked}
+            data-testid={checkboxTestId}
+            onChange={(e) => onCheckedChange(e.target.checked)}
+          />
+          <span className={styles.title} title={title}>
+            {title}
+          </span>
+        </label>
+        {actions && <div className={styles.actions}>{actions}</div>}
+      </div>
       <div className={styles.body} aria-disabled={!checked}>
         {children}
       </div>
     </div>
+  );
+}
+
+// A small icon button for a LayerCard header's `actions` slot.
+export function LayerCardIconButton({
+  label,
+  onClick,
+  testId,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  testId?: string;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      className={styles.iconBtn}
+      aria-label={label}
+      title={label}
+      data-testid={testId}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -86,10 +120,12 @@ export function LayerSlider({
 export function LayerToggleCard({
   id,
   title,
+  actions,
   children,
 }: {
   id: LayerId | string;
   title: string;
+  actions?: ReactNode;
   children?: ReactNode;
 }) {
   const visible = useUiStore((s) => s.layerVisibility[id] ?? true);
@@ -104,6 +140,7 @@ export function LayerToggleCard({
       onCheckedChange={(v) => setLayerVisibility(id, v)}
       checkboxTestId={`layer-toggle-${id}`}
       cardTestId={`layer-card-${id}`}
+      actions={actions}
     >
       <LayerSlider
         label="Opacity"
