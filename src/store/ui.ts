@@ -110,8 +110,7 @@ export interface UiStore {
   layerVisibility: Record<string, boolean>;
   layerOpacity: Record<string, number>;
   deselectedValues: Set<string>;
-  showLogDropZone: boolean;
-  logBurnIn: number;
+  showLogImport: boolean;
   dtaMapOverlay: 'none' | 'bf' | 'jumps' | 'rates';
   symmetryMode: SymmetryMode;
   // Minimum Bayes factor for a BSSVS route to show in the table and BF-arrow overlay.
@@ -122,8 +121,7 @@ export interface UiStore {
   pickLocationName: string | null;
   hoveredLocationName: string | null;
   setActivePanel: (panel: ActivePanel) => void;
-  setShowLogDropZone: (show: boolean) => void;
-  setLogBurnIn: (v: number) => void;
+  setShowLogImport: (show: boolean) => void;
   setDtaMapOverlay: (mode: 'none' | 'bf' | 'jumps' | 'rates') => void;
   setSymmetryMode: (mode: SymmetryMode) => void;
   setBssvsBfThreshold: (v: number) => void;
@@ -234,8 +232,7 @@ export const useUiStore = create<UiStore>((set) => ({
   layerVisibility: { ...DEFAULT_LAYER_VISIBILITY },
   layerOpacity: { ...DEFAULT_LAYER_OPACITY },
   deselectedValues: new Set<string>(),
-  showLogDropZone: false,
-  logBurnIn: 0.1,
+  showLogImport: false,
   dtaMapOverlay: 'none',
   symmetryMode: 'symmetric',
   bssvsBfThreshold: 0,
@@ -245,8 +242,7 @@ export const useUiStore = create<UiStore>((set) => ({
   pickLocationName: null,
   hoveredLocationName: null,
   setActivePanel: (activePanel) => set({ activePanel }),
-  setShowLogDropZone: (showLogDropZone) => set({ showLogDropZone }),
-  setLogBurnIn: (logBurnIn) => set({ logBurnIn }),
+  setShowLogImport: (showLogImport) => set({ showLogImport }),
   setDtaMapOverlay: (dtaMapOverlay) => set({ dtaMapOverlay }),
   setSymmetryMode: (symmetryMode) => set({ symmetryMode }),
   setBssvsBfThreshold: (bssvsBfThreshold) => set({ bssvsBfThreshold }),

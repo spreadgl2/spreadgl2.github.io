@@ -758,7 +758,11 @@ export function Loader({
     ) => {
       const kind: InputKind | null = inputKindForFileName(name);
       if (!kind) {
-        setError('Select a BEAST tree or .spreadgl2.json project file.');
+        setError(
+          name.toLowerCase().endsWith('.log')
+            ? 'BEAST .log files are added after a tree is open: use the Log row in the sidebar.'
+            : 'Select a BEAST tree or .spreadgl2.json project file.',
+        );
         return;
       }
       try {

@@ -154,32 +154,3 @@
   color: var(--error);
   font-size: var(--text-sm);
 }
-
-.burnInRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.burnInInput {
-  width: 60px;
-  padding: var(--space-1) var(--space-2);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--fg-primary);
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  text-align: right;
-}
-
-.burnInInput:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-  border-color: var(--accent);
-}
-
-.burnInUnit {
-  font-size: var(--text-md);
-  color: var(--fg-secondary);
-}

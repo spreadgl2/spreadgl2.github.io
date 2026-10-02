@@ -251,43 +251,6 @@ function AboutSection() {
   );
 }
 
-function BurnInSection() {
-  const burnIn = useUiStore((s) => s.logBurnIn);
-  const setLogBurnIn = useUiStore((s) => s.setLogBurnIn);
-  const logTable = useTreeStore((s) => s.logTable);
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = Math.max(0, Math.min(0.5, Number(e.target.value) / 100));
-    setLogBurnIn(val);
-    setPreference('logBurnIn', val);
-  }
-
-  return (
-    <section className={styles.section} data-testid="settings-burnin-section">
-      <span className={styles.label}>Log burn-in</span>
-      <div className={styles.burnInRow}>
-        <input
-          type="number"
-          min={0}
-          max={50}
-          step={1}
-          value={Math.round(burnIn * 100)}
-          onChange={handleChange}
-          className={styles.burnInInput}
-          data-testid="settings-burnin-input"
-        />
-        <span className={styles.burnInUnit}>%</span>
-      </div>
-      <p className={styles.hint}>
-        Drop the first N% of BEAST log samples before analysis.
-        {logTable !== null && (
-          <> Currently {logTable.rowCount.toLocaleString()} post-burn-in rows.</>
-        )}
-      </p>
-    </section>
-  );
-}
-
 function DataPrivacySection() {
   const [status, setStatus] = useState<'idle' | 'clearing' | 'cleared' | 'error'>('idle');
 
@@ -336,7 +299,6 @@ function ResetSection() {
   const setReducedMotion = useUiStore((s) => s.setReducedMotion);
   const setRenderQuality = useUiStore((s) => s.setRenderQuality);
   const setSidePanelWidth = useUiStore((s) => s.setSidePanelWidth);
-  const setLogBurnIn = useUiStore((s) => s.setLogBurnIn);
   const setSpeed = useTimelineStore((s) => s.setSpeed);
   const setMode = useTimelineStore((s) => s.setMode);
   const [confirmed, setConfirmed] = useState(false);
@@ -357,7 +319,6 @@ function ResetSection() {
     setReducedMotion(sysReduced);
     setRenderQuality('auto');
     setSidePanelWidth(280);
-    setLogBurnIn(0.1);
     setSpeed(1);
     setMode('Trail');
     void clearAllPreferences();
@@ -385,7 +346,6 @@ export function SettingsPanel() {
       <DateDisplaySection />
       <ReducedMotionSection />
       <RenderQualitySection />
-      <BurnInSection />
       <DataPrivacySection />
       <KeyboardSection />
       <AboutSection />

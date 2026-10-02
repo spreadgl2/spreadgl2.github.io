@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loader, type ParsedOpts } from './features/loader/Loader';
 import { LocationAnnotationWarning } from './features/loader/LocationAnnotationWarning';
 import { LocationCsvDropZone } from './features/loader/LocationCsvDropZone';
-import { LogDropZone } from './features/loader/LogDropZone';
+import { LogImportModal } from './features/loader/LogImportModal';
 import { useTauriDeepLink } from './features/tauri-deep-link/useTauriDeepLink';
 import { usePlaybackLoop } from './features/timeline/playback';
 import { DEFAULT_WINDOW_FRACTION } from './features/timeline/window-config';
@@ -197,18 +197,15 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
   const setLayerVisibility = useUiStore((s) => s.setLayerVisibility);
   const setLayerOpacity = useUiStore((s) => s.setLayerOpacity);
   const setSpeed = useTimelineStore((s) => s.setSpeed);
-  const showLogDropZone = useUiStore((s) => s.showLogDropZone);
-  const setShowLogDropZone = useUiStore((s) => s.setShowLogDropZone);
+  const showLogImport = useUiStore((s) => s.showLogImport);
+  const setShowLogImport = useUiStore((s) => s.setShowLogImport);
   const setLogTable = useTreeStore((s) => s.setLogTable);
-  const setLogStatus = useTreeStore((s) => s.setLogStatus);
   const colorByKey = useUiStore((s) => s.colorByKey);
   const palette = useUiStore((s) => s.palette);
 
   const sidePanelWidth = useUiStore((s) => s.sidePanelWidth);
   const animationMode = useTimelineStore((s) => s.mode);
   const animationSpeed = useTimelineStore((s) => s.speed);
-
-  const logBurnIn = useUiStore((s) => s.logBurnIn);
 
   const logWorkerRef = useRef<Worker | null>(null);
   const logApiRef = useRef<Comlink.Remote<LogWorkerApi> | null>(null);
@@ -346,7 +343,6 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
       if (stored.treeSplitFraction !== undefined) ui.setTreeSplitFraction(stored.treeSplitFraction);
       if (stored.animationSpeed !== undefined) tl.setSpeed(stored.animationSpeed);
       if (stored.animationMode) tl.setMode(stored.animationMode as PlayMode);
-      if (stored.logBurnIn !== undefined) useUiStore.getState().setLogBurnIn(stored.logBurnIn);
     }
     restore();
   }, []);
@@ -803,32 +799,31 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
     ],
   );
 
-  const handleLogFile = useCallback(
-    (file: File) => {
+  const inspectLogFile = useCallback(async (file: File) => {
+    const api = logApiRef.current;
+    if (!api) throw new Error('The log reader is not ready yet.');
+    return api.inspect(file);
+  }, []);
+
+  // Errors propagate to the import modal; the loaded log is only replaced on success.
+  const loadLogFile = useCallback(
+    async (file: File, burnInFraction: number) => {
       const api = logApiRef.current;
-      if (!api) return;
-      setLogStatus('loading');
-      api
-        .parse(file, { burnInFraction: logBurnIn })
-        .then((table) => {
-          setLogTable(table, file.name);
-          // If the log carries BSSVS indicators for the tree's discrete trait,
-          // surface them straight away: open the Analysis panel on the BSSVS tab.
-          const { traitInfo } = useTreeStore.getState();
-          if (
-            traitInfo?.kind === 'discrete' &&
-            detectTraitNameForStates(table.columnNames, traitInfo.values) !== null
-          ) {
-            setVisibleView('analysis', true);
-            setAnalysisTab('bssvs');
-          }
-        })
-        .catch((e: unknown) => {
-          const msg = e instanceof Error ? e.message : String(e);
-          setLogStatus('error', msg);
-        });
+      if (!api) throw new Error('The log reader is not ready yet.');
+      const table = await api.parse(file, { burnInFraction });
+      setLogTable(table, file.name);
+      // If the log carries BSSVS indicators for the tree's discrete trait,
+      // surface them straight away: open the Analysis panel on the BSSVS tab.
+      const { traitInfo } = useTreeStore.getState();
+      if (
+        traitInfo?.kind === 'discrete' &&
+        detectTraitNameForStates(table.columnNames, traitInfo.values) !== null
+      ) {
+        setVisibleView('analysis', true);
+        setAnalysisTab('bssvs');
+      }
     },
-    [logBurnIn, setLogTable, setLogStatus, setVisibleView, setAnalysisTab],
+    [setLogTable, setVisibleView, setAnalysisTab],
   );
 
   const handleProjectFileDrop = useCallback((file: ProjectFile) => {
@@ -871,8 +866,13 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
       {showViewer && (
         <div key="viewer" style={{ width: '100vw', height: '100vh' }}>
           <Viewer onReplaceFile={handleReplaceFile} />
-          {showLogDropZone && (
-            <LogDropZone onFile={handleLogFile} onClose={() => setShowLogDropZone(false)} />
+          {showLogImport && (
+            <LogImportModal
+              treeStates={traitInfo?.kind === 'discrete' ? traitInfo.values : null}
+              inspect={inspectLogFile}
+              load={loadLogFile}
+              onClose={() => setShowLogImport(false)}
+            />
           )}
         </div>
       )}

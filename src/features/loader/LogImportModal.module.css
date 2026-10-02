@@ -1,0 +1,146 @@
+@import "../../styles/tokens.css";
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 140px;
+  box-sizing: border-box;
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  gap: var(--space-2);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+}
+
+.dropZoneDragging {
+  border-color: var(--accent);
+  background: var(--accent-translucent);
+}
+
+.dropLabel {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  color: var(--fg-primary);
+}
+
+.dropFormats {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--fg-tertiary);
+}
+
+.openFileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  align-self: center;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  color: var(--fg-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  cursor: pointer;
+}
+
+.openFileBtn:hover {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.openFileBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.status {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+}
+
+.notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--warning);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-primary);
+  line-height: 1.5;
+}
+
+.burnInRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.burnInInput {
+  width: 80px;
+  box-sizing: border-box;
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  color: var(--fg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-md);
+  text-align: left;
+}
+
+/* Hide spinners to keep the field compact; arrow keys still step. */
+.burnInInput {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.burnInInput::-webkit-inner-spin-button,
+.burnInInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.burnInInput:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.burnInInput[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.burnInFraction {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+}
+
+.burnInUnit {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--fg-secondary);
+}

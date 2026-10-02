@@ -13,7 +13,6 @@ export interface Preferences {
   analysisPanelHeight: number;
   animationMode: string;
   animationSpeed: number;
-  logBurnIn: number;
 }
 
 export const DEFAULTS: Preferences = {
@@ -28,7 +27,6 @@ export const DEFAULTS: Preferences = {
   analysisPanelHeight: 156,
   animationMode: 'Trail',
   animationSpeed: 1,
-  logBurnIn: 0.1,
 };
 
 const STORAGE_KEY = 'spreadgl2_prefs';

@@ -337,6 +337,17 @@ describe('Loader', () => {
     });
   });
 
+  it('points dropped .log files to the Log import instead of parsing them', async () => {
+    render(<Loader onParsed={vi.fn()} />);
+    const file = new File(['state\tposterior\n'], 'run.log', { type: 'text/plain' });
+    fireEvent.drop(screen.getByTestId('drop-zone'), { dataTransfer: { files: [file] } });
+
+    expect((await screen.findByTestId('loader-error')).textContent).toMatch(
+      /use the Log row in the sidebar/,
+    );
+    expect(mockParseWithProgress).not.toHaveBeenCalled();
+  });
+
   it('simulating file drop triggers worker parse', async () => {
     const onParsed = vi.fn();
     render(<Loader onParsed={onParsed} />);

@@ -271,3 +271,8 @@
   border-color: var(--fg-secondary);
   color: var(--fg-primary);
 }
+
+.altBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

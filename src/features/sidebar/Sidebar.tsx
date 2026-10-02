@@ -177,7 +177,7 @@ export function Sidebar({ onReplaceFile }: SidebarProps) {
   const paletteReverse = useUiStore((s) => s.paletteReverse);
   const activePanel = useUiStore((s) => s.activePanel);
   const setActivePanel = useUiStore((s) => s.setActivePanel);
-  const setShowLogDropZone = useUiStore((s) => s.setShowLogDropZone);
+  const setShowLogImport = useUiStore((s) => s.setShowLogImport);
   const bounds = useTimelineStore((s) => s.bounds);
   const deselectedValues = useUiStore((s) => s.deselectedValues);
   const toggleLegendValue = useUiStore((s) => s.toggleLegendValue);
@@ -530,7 +530,7 @@ export function Sidebar({ onReplaceFile }: SidebarProps) {
               ].join(' ')}
               data-testid="sidebar-log-row"
               title={logStatus === 'loaded' ? 'BEAST log file loaded' : 'Load a BEAST .log file'}
-              onClick={() => setShowLogDropZone(true)}
+              onClick={() => setShowLogImport(true)}
             >
               <span className={[styles.dataIcon, logStatusClass(logStatus)].join(' ')} />
               <span className={styles.dataLabel}>Log</span>
