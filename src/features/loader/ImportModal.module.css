@@ -248,6 +248,11 @@
   background: var(--accent-hover);
 }
 
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .altBtn {
   padding: var(--space-2) var(--space-4);
   background: transparent;

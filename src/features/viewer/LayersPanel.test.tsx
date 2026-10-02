@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useEnvStore } from '../../store/env';
 import { useRasterStore } from '../../store/raster';
@@ -96,6 +96,48 @@ describe('LayersPanel', () => {
     render(<LayersPanel />);
     expect(screen.getByTestId('add-overlay-btn')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Add boundaries (GeoJSON)' })).toBeTruthy();
+  });
+
+  it('asks for the coordinate order before adding an uploaded GeoJSON boundary', async () => {
+    render(<LayersPanel />);
+    const geojson = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: { name: 'Beijing' },
+          geometry: { type: 'Point', coordinates: [39.9, 116.4] },
+        },
+      ],
+    });
+    const file = new File([geojson], 'regions.geojson', { type: 'application/geo+json' });
+    fireEvent.change(screen.getByTestId('overlay-file-input'), { target: { files: [file] } });
+
+    expect(await screen.findByTestId('geojson-axis-modal')).toBeTruthy();
+    expect(useTreeStore.getState().customOverlays).toHaveLength(0);
+    expect((screen.getByTestId('geojson-axis-position-1') as HTMLSelectElement).value).toBe(
+      'latitude',
+    );
+
+    fireEvent.click(screen.getByTestId('geojson-axis-confirm'));
+    await waitFor(() => expect(screen.queryByTestId('geojson-axis-modal')).toBeNull());
+    const [overlay] = useTreeStore.getState().customOverlays;
+    expect(overlay?.name).toBe('regions');
+    expect(overlay?.data.features[0]?.geometry).toEqual({
+      type: 'Point',
+      coordinates: [116.4, 39.9],
+    });
+  });
+
+  it('adds nothing when the coordinate order dialog is cancelled', async () => {
+    render(<LayersPanel />);
+    const geojson = JSON.stringify({ type: 'FeatureCollection', features: [] });
+    const file = new File([geojson], 'empty.geojson', { type: 'application/geo+json' });
+    fireEvent.change(screen.getByTestId('overlay-file-input'), { target: { files: [file] } });
+
+    fireEvent.click(await screen.findByTestId('geojson-axis-cancel'));
+    expect(screen.queryByTestId('geojson-axis-modal')).toBeNull();
+    expect(useTreeStore.getState().customOverlays).toHaveLength(0);
   });
 
   it('enables region data import only after boundaries are loaded', () => {

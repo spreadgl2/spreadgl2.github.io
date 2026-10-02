@@ -2,14 +2,27 @@ import type { FeatureCollection } from 'geojson';
 import { useCallback, useRef, useState } from 'react';
 import { ENV_PALETTES, type EnvPaletteId } from '../../lib/env/palettes';
 import { parseEnvCSV } from '../../lib/format/env-csv';
+import {
+  type AxisOrder,
+  type AxisSummary,
+  summarizeAxes,
+  toLonLatOrder,
+} from '../../lib/format/geojson-axis';
 import { loadGeoTIFF } from '../../lib/geotiff/loader';
 import { parseFeatureCollection } from '../../lib/security/geojson';
 import { assertInputSize } from '../../lib/security/input-limits';
 import { useEnvStore } from '../../store/env';
 import { useRasterStore } from '../../store/raster';
 import { useTreeStore } from '../../store/tree';
+import { GeoJsonAxisModal } from './GeoJsonAxisModal';
 import { LayerToggleCard } from './LayerCard';
 import styles from './LayersPanel.module.css';
+
+interface PendingBoundary {
+  name: string;
+  data: FeatureCollection;
+  summary: AxisSummary;
+}
 
 const REGION_DATA_DISABLED_TITLE =
   'Load a boundary GeoJSON first so CSV values can be matched to regions.';
@@ -27,6 +40,7 @@ export function LayersPanel() {
   const envCsvInputRef = useRef<HTMLInputElement>(null);
   const geotiffInputRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [pendingBoundary, setPendingBoundary] = useState<PendingBoundary | null>(null);
 
   const envColumns = useEnvStore((s) => s.columns);
   const activeEnvKey = useEnvStore((s) => s.activeKey);
@@ -50,40 +64,52 @@ export function LayersPanel() {
     envCsvInputRef.current?.click();
   }, [canAddRegionData]);
 
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      assertInputSize('geojson', file.size);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'The GeoJSON file is too large.');
+      return;
+    }
+    setImportError(null);
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
       try {
-        assertInputSize('geojson', file.size);
+        const data = parseFeatureCollection(ev.target?.result as string);
+        setPendingBoundary({
+          name: file.name.replace(/\.geojson$/i, ''),
+          data,
+          summary: summarizeAxes(data),
+        });
       } catch (err) {
-        setImportError(err instanceof Error ? err.message : 'The GeoJSON file is too large.');
-        return;
+        setImportError(err instanceof Error ? err.message : 'Could not read the GeoJSON file.');
       }
-      setImportError(null);
+    };
+    reader.onerror = () => setImportError('Could not read the GeoJSON file.');
+    reader.readAsText(file);
 
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const data = parseFeatureCollection(ev.target?.result as string);
-          addCustomOverlay({
-            id: crypto.randomUUID(),
-            name: file.name.replace(/\.geojson$/i, ''),
-            data,
-          });
-        } catch (err) {
-          setImportError(err instanceof Error ? err.message : 'Could not read the GeoJSON file.');
-        }
-      };
-      reader.onerror = () => setImportError('Could not read the GeoJSON file.');
-      reader.readAsText(file);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, []);
 
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+  const handleConfirmAxisOrder = useCallback(
+    (order: AxisOrder) => {
+      if (!pendingBoundary) return;
+      addCustomOverlay({
+        id: crypto.randomUUID(),
+        name: pendingBoundary.name,
+        data: toLonLatOrder(pendingBoundary.data, order),
+      });
+      setPendingBoundary(null);
     },
-    [addCustomOverlay],
+    [addCustomOverlay, pendingBoundary],
   );
+
+  const handleCancelAxisOrder = useCallback(() => setPendingBoundary(null), []);
 
   const handleEnvCsvChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,6 +269,14 @@ export function LayersPanel() {
 
   return (
     <div className={styles.panel} data-testid="layers-panel">
+      {pendingBoundary && (
+        <GeoJsonAxisModal
+          fileName={pendingBoundary.name}
+          summary={pendingBoundary.summary}
+          onConfirm={handleConfirmAxisOrder}
+          onCancel={handleCancelAxisOrder}
+        />
+      )}
       {importError && (
         <p className={styles.importError} role="alert" data-testid="layers-import-error">
           {importError}
