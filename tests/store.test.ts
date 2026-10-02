@@ -280,3 +280,57 @@ describe('ui store', () => {
     }
   });
 });
+
+describe('updateCustomOverlay', () => {
+  const boundary = {
+    type: 'FeatureCollection' as const,
+    features: [
+      {
+        type: 'Feature' as const,
+        properties: { name: 'A' },
+        geometry: { type: 'Point' as const, coordinates: [10, 20] },
+      },
+    ],
+  };
+  const swapped = {
+    ...boundary,
+    features: [{ ...boundary.features[0]!, geometry: { type: 'Point' as const, coordinates: [20, 10] } }],
+  };
+
+  beforeEach(() => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'a', name: 'first', data: boundary },
+        { id: 'b', name: 'second', data: { type: 'FeatureCollection', features: [] } },
+      ],
+      choroplethOverlays: [
+        {
+          id: 'region',
+          name: 'region',
+          data: boundary,
+          valueByLocation: new Map(),
+          valueColumn: 'v',
+          locationCol: 'name',
+        },
+      ],
+    });
+  });
+
+  it('replaces the overlay in place and records the axis order', () => {
+    useTreeStore.getState().updateCustomOverlay('a', { data: swapped, axisOrder: 'lat-lon' });
+    const { customOverlays } = useTreeStore.getState();
+    expect(customOverlays.map((o) => o.id)).toEqual(['a', 'b']);
+    expect(customOverlays[0]).toMatchObject({ name: 'first', data: swapped, axisOrder: 'lat-lon' });
+  });
+
+  it('carries new boundary data into region data joined to that boundary', () => {
+    useTreeStore.getState().updateCustomOverlay('a', { data: swapped, axisOrder: 'lat-lon' });
+    expect(useTreeStore.getState().choroplethOverlays[0]?.data).toBe(swapped);
+  });
+
+  it('ignores unknown overlay ids', () => {
+    const before = useTreeStore.getState().customOverlays;
+    useTreeStore.getState().updateCustomOverlay('missing', { name: 'x' });
+    expect(useTreeStore.getState().customOverlays).toBe(before);
+  });
+});

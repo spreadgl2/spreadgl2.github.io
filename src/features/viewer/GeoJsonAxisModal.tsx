@@ -16,6 +16,9 @@ type Axis = 'longitude' | 'latitude';
 interface Props {
   fileName: string;
   summary: AxisSummary;
+  /** Order to pre-select; detected from the data when omitted. */
+  initialOrder?: AxisOrder | undefined;
+  confirmLabel?: string;
   onConfirm: (order: AxisOrder) => void;
   onCancel: () => void;
 }
@@ -38,8 +41,15 @@ function formatPosition(position: number[]): string {
   return `[${position.map((value) => value.toFixed(4)).join(', ')}]`;
 }
 
-export function GeoJsonAxisModal({ fileName, summary, onConfirm, onCancel }: Props) {
-  const [order, setOrder] = useState<AxisOrder>(() => detectAxisOrder(summary));
+export function GeoJsonAxisModal({
+  fileName,
+  summary,
+  initialOrder,
+  confirmLabel = 'Add boundaries',
+  onConfirm,
+  onCancel,
+}: Props) {
+  const [order, setOrder] = useState<AxisOrder>(() => initialOrder ?? detectAxisOrder(summary));
   const dialogRef = useRef<HTMLDivElement>(null);
   const firstSelectRef = useRef<HTMLSelectElement>(null);
   useModalAccessibility({ dialogRef, initialFocusRef: firstSelectRef, onEscape: onCancel });
@@ -105,7 +115,7 @@ export function GeoJsonAxisModal({ fileName, summary, onConfirm, onCancel }: Pro
             onClick={() => onConfirm(order)}
             data-testid="geojson-axis-confirm"
           >
-            Add boundaries
+            {confirmLabel}
           </button>
           <button
             type="button"

@@ -58,4 +58,12 @@ test('uploaded GeoJSON asks for coordinate order before it is added', async ({ p
   await page.locator('[data-testid="geojson-axis-confirm"]').click();
   await expect(dialog).toBeHidden();
   await expect(page.getByText('belo-horizonte', { exact: true })).toBeVisible();
+
+  // The gear on the boundary card reopens the dialog with the chosen order.
+  await page.getByRole('button', { name: 'Coordinate order for belo-horizonte' }).click();
+  await expect(dialog).toBeVisible();
+  await expect(position1).toHaveValue('latitude');
+  await expect(page.locator('[data-testid="geojson-axis-confirm"]')).toHaveText('Apply');
+  await page.locator('[data-testid="geojson-axis-cancel"]').click();
+  await expect(dialog).toBeHidden();
 });

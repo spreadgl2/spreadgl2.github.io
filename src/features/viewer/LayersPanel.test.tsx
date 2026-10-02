@@ -123,10 +123,96 @@ describe('LayersPanel', () => {
     await waitFor(() => expect(screen.queryByTestId('geojson-axis-modal')).toBeNull());
     const [overlay] = useTreeStore.getState().customOverlays;
     expect(overlay?.name).toBe('regions');
+    expect(overlay?.axisOrder).toBe('lat-lon');
     expect(overlay?.data.features[0]?.geometry).toEqual({
       type: 'Point',
       coordinates: [116.4, 39.9],
     });
+  });
+
+  it('gear icon reopens the coordinate dialog and re-applies a new order', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        {
+          id: 'ov-1',
+          name: 'regions',
+          axisOrder: 'lon-lat',
+          data: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: { type: 'Point', coordinates: [20, 10] },
+              },
+            ],
+          },
+        },
+      ],
+    });
+    render(<LayersPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Coordinate order for regions' }));
+    expect(screen.getByTestId('geojson-axis-modal')).toBeTruthy();
+    expect((screen.getByTestId('geojson-axis-position-1') as HTMLSelectElement).value).toBe(
+      'longitude',
+    );
+    expect(screen.getByTestId('geojson-axis-confirm').textContent).toBe('Apply');
+
+    fireEvent.change(screen.getByTestId('geojson-axis-position-1'), {
+      target: { value: 'latitude' },
+    });
+    fireEvent.click(screen.getByTestId('geojson-axis-confirm'));
+
+    expect(screen.queryByTestId('geojson-axis-modal')).toBeNull();
+    const [overlay] = useTreeStore.getState().customOverlays;
+    expect(overlay?.id).toBe('ov-1');
+    expect(overlay?.axisOrder).toBe('lat-lon');
+    expect(overlay?.data.features[0]?.geometry).toEqual({ type: 'Point', coordinates: [10, 20] });
+  });
+
+  it('shows the source file order when re-editing a latitude-first boundary', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        {
+          id: 'ov-1',
+          name: 'regions',
+          axisOrder: 'lat-lon',
+          data: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: { type: 'Point', coordinates: [116.4, 39.9] },
+              },
+            ],
+          },
+        },
+      ],
+    });
+    render(<LayersPanel />);
+    fireEvent.click(screen.getByTestId('boundary-axis-btn-ov-1'));
+
+    expect(screen.getByText('[39.9000, 116.4000]')).toBeTruthy();
+    expect((screen.getByTestId('geojson-axis-position-1') as HTMLSelectElement).value).toBe(
+      'latitude',
+    );
+    fireEvent.click(screen.getByTestId('geojson-axis-cancel'));
+    expect(useTreeStore.getState().customOverlays[0]?.axisOrder).toBe('lat-lon');
+  });
+
+  it('gear icon does not toggle boundary visibility', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'ov-1', name: 'regions', data: { type: 'FeatureCollection', features: [] } },
+      ],
+    });
+    render(<LayersPanel />);
+    const toggle = screen.getByTestId('layer-toggle-ov-1') as HTMLInputElement;
+    expect(toggle.checked).toBe(true);
+    fireEvent.click(screen.getByTestId('boundary-axis-btn-ov-1'));
+    expect(toggle.checked).toBe(true);
   });
 
   it('adds nothing when the coordinate order dialog is cancelled', async () => {

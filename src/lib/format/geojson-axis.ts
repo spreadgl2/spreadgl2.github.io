@@ -137,3 +137,11 @@ export function toLonLatOrder(data: FeatureCollection, order: AxisOrder): Featur
     })),
   };
 }
+
+/**
+ * Inverse of toLonLatOrder: restores the order the file was written in. Swapping
+ * is its own inverse, so this only exists to name the intent at call sites.
+ */
+export function fromLonLatOrder(data: FeatureCollection, order: AxisOrder): FeatureCollection {
+  return toLonLatOrder(data, order);
+}

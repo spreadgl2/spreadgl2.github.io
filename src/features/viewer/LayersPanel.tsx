@@ -1,10 +1,12 @@
 import type { FeatureCollection } from 'geojson';
+import { Settings } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { ENV_PALETTES, type EnvPaletteId } from '../../lib/env/palettes';
 import { parseEnvCSV } from '../../lib/format/env-csv';
 import {
   type AxisOrder,
   type AxisSummary,
+  fromLonLatOrder,
   summarizeAxes,
   toLonLatOrder,
 } from '../../lib/format/geojson-axis';
@@ -13,15 +15,19 @@ import { parseFeatureCollection } from '../../lib/security/geojson';
 import { assertInputSize } from '../../lib/security/input-limits';
 import { useEnvStore } from '../../store/env';
 import { useRasterStore } from '../../store/raster';
-import { useTreeStore } from '../../store/tree';
+import { type CustomOverlay, useTreeStore } from '../../store/tree';
 import { GeoJsonAxisModal } from './GeoJsonAxisModal';
-import { LayerToggleCard } from './LayerCard';
+import { LayerCardIconButton, LayerToggleCard } from './LayerCard';
 import styles from './LayersPanel.module.css';
 
 interface PendingBoundary {
+  /** Set when re-editing a loaded boundary; absent for a new upload. */
+  overlayId?: string;
   name: string;
+  /** Coordinates as written in the source file. */
   data: FeatureCollection;
   summary: AxisSummary;
+  initialOrder?: AxisOrder;
 }
 
 const REGION_DATA_DISABLED_TITLE =
@@ -29,6 +35,7 @@ const REGION_DATA_DISABLED_TITLE =
 
 export function LayersPanel() {
   const addCustomOverlay = useTreeStore((s) => s.addCustomOverlay);
+  const updateCustomOverlay = useTreeStore((s) => s.updateCustomOverlay);
   const addChoroplethOverlay = useTreeStore((s) => s.addChoroplethOverlay);
   const clearCustomOverlays = useTreeStore((s) => s.clearCustomOverlays);
   const clearChoroplethOverlays = useTreeStore((s) => s.clearChoroplethOverlays);
@@ -96,17 +103,35 @@ export function LayersPanel() {
     }
   }, []);
 
+  const handleEditAxisOrder = useCallback((overlay: CustomOverlay) => {
+    const order = overlay.axisOrder ?? 'lon-lat';
+    const data = fromLonLatOrder(overlay.data, order);
+    setPendingBoundary({
+      overlayId: overlay.id,
+      name: overlay.name,
+      data,
+      summary: summarizeAxes(data),
+      initialOrder: order,
+    });
+  }, []);
+
   const handleConfirmAxisOrder = useCallback(
     (order: AxisOrder) => {
       if (!pendingBoundary) return;
-      addCustomOverlay({
-        id: crypto.randomUUID(),
-        name: pendingBoundary.name,
-        data: toLonLatOrder(pendingBoundary.data, order),
-      });
+      const data = toLonLatOrder(pendingBoundary.data, order);
+      if (pendingBoundary.overlayId) {
+        updateCustomOverlay(pendingBoundary.overlayId, { data, axisOrder: order });
+      } else {
+        addCustomOverlay({
+          id: crypto.randomUUID(),
+          name: pendingBoundary.name,
+          data,
+          axisOrder: order,
+        });
+      }
       setPendingBoundary(null);
     },
-    [addCustomOverlay, pendingBoundary],
+    [addCustomOverlay, pendingBoundary, updateCustomOverlay],
   );
 
   const handleCancelAxisOrder = useCallback(() => setPendingBoundary(null), []);
@@ -273,6 +298,8 @@ export function LayersPanel() {
         <GeoJsonAxisModal
           fileName={pendingBoundary.name}
           summary={pendingBoundary.summary}
+          initialOrder={pendingBoundary.initialOrder}
+          confirmLabel={pendingBoundary.overlayId ? 'Apply' : 'Add boundaries'}
           onConfirm={handleConfirmAxisOrder}
           onCancel={handleCancelAxisOrder}
         />
@@ -300,7 +327,20 @@ export function LayersPanel() {
           )}
         </div>
         {customOverlays.map((overlay) => (
-          <LayerToggleCard key={overlay.id} id={overlay.id} title={overlay.name} />
+          <LayerToggleCard
+            key={overlay.id}
+            id={overlay.id}
+            title={overlay.name}
+            actions={
+              <LayerCardIconButton
+                label={`Coordinate order for ${overlay.name}`}
+                testId={`boundary-axis-btn-${overlay.id}`}
+                onClick={() => handleEditAxisOrder(overlay)}
+              >
+                <Settings size={14} aria-hidden="true" />
+              </LayerCardIconButton>
+            }
+          />
         ))}
         <div className={styles.addOverlayRow}>
           <button
