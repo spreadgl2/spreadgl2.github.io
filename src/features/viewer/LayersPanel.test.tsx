@@ -215,6 +215,35 @@ describe('LayersPanel', () => {
     expect(toggle.checked).toBe(true);
   });
 
+  it('trash icon removes only that boundary and leaves the others', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'ov-1', name: 'provinces', data: { type: 'FeatureCollection', features: [] } },
+        { id: 'ov-2', name: 'districts', data: { type: 'FeatureCollection', features: [] } },
+      ],
+    });
+    render(<LayersPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove provinces' }));
+
+    expect(useTreeStore.getState().customOverlays.map((o) => o.id)).toEqual(['ov-2']);
+    expect(screen.queryByTestId('layer-card-ov-1')).toBeNull();
+    expect(screen.getByTestId('layer-card-ov-2')).toBeTruthy();
+    expect(screen.getByTestId('clear-boundary-btn')).toBeTruthy();
+  });
+
+  it('removing the last boundary hides Clear Data', () => {
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'ov-1', name: 'provinces', data: { type: 'FeatureCollection', features: [] } },
+      ],
+    });
+    render(<LayersPanel />);
+    fireEvent.click(screen.getByTestId('boundary-remove-btn-ov-1'));
+    expect(useTreeStore.getState().customOverlays).toHaveLength(0);
+    expect(screen.queryByTestId('clear-boundary-btn')).toBeNull();
+  });
+
   it('adds nothing when the coordinate order dialog is cancelled', async () => {
     render(<LayersPanel />);
     const geojson = JSON.stringify({ type: 'FeatureCollection', features: [] });

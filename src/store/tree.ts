@@ -99,6 +99,7 @@ export interface TreeStore {
   addCustomOverlay: (overlay: CustomOverlay) => void;
   addChoroplethOverlay: (overlay: ChoroplethOverlay) => void;
   updateCustomOverlay: (id: string, patch: Partial<Omit<CustomOverlay, 'id'>>) => void;
+  removeCustomOverlay: (id: string) => void;
   clearCustomOverlays: () => void;
   clearChoroplethOverlays: () => void;
   setLogTable: (table: LogTable, fileName: string) => void;
@@ -220,6 +221,8 @@ export const useTreeStore = create<TreeStore>((set) => ({
               ),
       };
     }),
+  removeCustomOverlay: (id) =>
+    set((state) => ({ customOverlays: state.customOverlays.filter((o) => o.id !== id) })),
   clearCustomOverlays: () => set({ customOverlays: [] }),
   clearChoroplethOverlays: () => set({ choroplethOverlays: [] }),
   setLogTable: (table, fileName) =>

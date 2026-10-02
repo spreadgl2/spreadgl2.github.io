@@ -334,3 +334,18 @@ describe('updateCustomOverlay', () => {
     expect(useTreeStore.getState().customOverlays).toBe(before);
   });
 });
+
+describe('removeCustomOverlay', () => {
+  it('removes only the overlay with the given id', () => {
+    const empty = { type: 'FeatureCollection' as const, features: [] };
+    useTreeStore.setState({
+      customOverlays: [
+        { id: 'a', name: 'first', data: empty },
+        { id: 'b', name: 'second', data: empty },
+        { id: 'c', name: 'third', data: empty },
+      ],
+    });
+    useTreeStore.getState().removeCustomOverlay('b');
+    expect(useTreeStore.getState().customOverlays.map((o) => o.id)).toEqual(['a', 'c']);
+  });
+});

@@ -66,4 +66,9 @@ test('uploaded GeoJSON asks for coordinate order before it is added', async ({ p
   await expect(page.locator('[data-testid="geojson-axis-confirm"]')).toHaveText('Apply');
   await page.locator('[data-testid="geojson-axis-cancel"]').click();
   await expect(dialog).toBeHidden();
+
+  // The trash icon removes just this boundary.
+  await page.getByRole('button', { name: 'Remove belo-horizonte' }).click();
+  await expect(page.getByText('belo-horizonte', { exact: true })).toBeHidden();
+  await expect(page.locator('[data-testid="clear-boundary-btn"]')).toBeHidden();
 });

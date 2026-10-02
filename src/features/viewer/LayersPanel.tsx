@@ -1,5 +1,5 @@
 import type { FeatureCollection } from 'geojson';
-import { Settings } from 'lucide-react';
+import { Settings, Trash2 } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { ENV_PALETTES, type EnvPaletteId } from '../../lib/env/palettes';
 import { parseEnvCSV } from '../../lib/format/env-csv';
@@ -36,6 +36,7 @@ const REGION_DATA_DISABLED_TITLE =
 export function LayersPanel() {
   const addCustomOverlay = useTreeStore((s) => s.addCustomOverlay);
   const updateCustomOverlay = useTreeStore((s) => s.updateCustomOverlay);
+  const removeCustomOverlay = useTreeStore((s) => s.removeCustomOverlay);
   const addChoroplethOverlay = useTreeStore((s) => s.addChoroplethOverlay);
   const clearCustomOverlays = useTreeStore((s) => s.clearCustomOverlays);
   const clearChoroplethOverlays = useTreeStore((s) => s.clearChoroplethOverlays);
@@ -332,13 +333,22 @@ export function LayersPanel() {
             id={overlay.id}
             title={overlay.name}
             actions={
-              <LayerCardIconButton
-                label={`Coordinate order for ${overlay.name}`}
-                testId={`boundary-axis-btn-${overlay.id}`}
-                onClick={() => handleEditAxisOrder(overlay)}
-              >
-                <Settings size={14} aria-hidden="true" />
-              </LayerCardIconButton>
+              <>
+                <LayerCardIconButton
+                  label={`Coordinate order for ${overlay.name}`}
+                  testId={`boundary-axis-btn-${overlay.id}`}
+                  onClick={() => handleEditAxisOrder(overlay)}
+                >
+                  <Settings size={14} aria-hidden="true" />
+                </LayerCardIconButton>
+                <LayerCardIconButton
+                  label={`Remove ${overlay.name}`}
+                  testId={`boundary-remove-btn-${overlay.id}`}
+                  onClick={() => removeCustomOverlay(overlay.id)}
+                >
+                  <Trash2 size={14} aria-hidden="true" />
+                </LayerCardIconButton>
+              </>
             }
           />
         ))}
