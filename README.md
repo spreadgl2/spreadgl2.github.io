@@ -13,7 +13,7 @@ and movement through time are shown together in a linked tree and map view.
 - Inspect node annotations, location uncertainty, and HPD polygons.
 - Color and filter branches by posterior support or annotated traits.
 - Analyze lineage-through-time curves, migration transitions, BSSVS support,
-  Markov jumps, and actual migration rates.
+  and Markov jumps.
 - Import location, boundary, raster, and environmental data.
 - Export images, tables, project files, and shareable application state.
 - Work entirely in the browser or build a native Tauri application.

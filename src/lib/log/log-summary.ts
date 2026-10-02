@@ -1,4 +1,3 @@
-import { detectRateTraitName } from './actual-rates';
 import { detectTraitNameForStates, detectTraitNames } from './bssvs';
 import { detectJumpTraitName } from './markov-jumps';
 
@@ -9,7 +8,6 @@ export interface LogContentSummary {
   /** BSSVS trait matching the tree's discrete states; null for continuous trees or no match. */
   matchedBssvsTrait: string | null;
   markovJumpTrait: string | null;
-  actualRatesTrait: string | null;
 }
 
 /** @param treeStates the tree's discrete states, or null for a continuous tree */
@@ -21,14 +19,9 @@ export function summarizeLogColumns(
     bssvsTraits: detectTraitNames(columnNames),
     matchedBssvsTrait: treeStates ? detectTraitNameForStates(columnNames, treeStates) : null,
     markovJumpTrait: detectJumpTraitName(columnNames),
-    actualRatesTrait: detectRateTraitName(columnNames),
   };
 }
 
 export function hasLogAnalyses(summary: LogContentSummary): boolean {
-  return (
-    summary.bssvsTraits.length > 0 ||
-    summary.markovJumpTrait !== null ||
-    summary.actualRatesTrait !== null
-  );
+  return summary.bssvsTraits.length > 0 || summary.markovJumpTrait !== null;
 }

@@ -2,7 +2,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { LogInspection } from '../../lib/log/log-table';
-import { burnInSampleCount, LogImportModal, parseBurnInPercent } from './LogImportModal';
+import {
+  burnInSampleCount,
+  type CurrentLog,
+  LogImportModal,
+  parseBurnInPercent,
+} from './LogImportModal';
 
 afterEach(() => {
   cleanup();
@@ -20,8 +25,10 @@ function logFile(name = 'run.log'): File {
 function renderModal(overrides: Partial<React.ComponentProps<typeof LogImportModal>> = {}) {
   const props = {
     treeStates: ['A', 'B'] as string[] | null,
+    current: null as CurrentLog | null,
     inspect: vi.fn().mockResolvedValue(BSSVS_INSPECTION),
     load: vi.fn().mockResolvedValue(undefined),
+    onRemove: vi.fn(),
     onClose: vi.fn(),
     ...overrides,
   };
@@ -97,7 +104,7 @@ describe('LogImportModal', () => {
     const file = logFile();
     chooseFile(file);
     fireEvent.click(await screen.findByTestId('log-import-confirm'));
-    expect(load).toHaveBeenCalledWith(file, 0.1);
+    expect(load).toHaveBeenCalledWith(file, 0.1, 1001);
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 
@@ -109,7 +116,7 @@ describe('LogImportModal', () => {
     fireEvent.change(input, { target: { value: '25' } });
     expect(screen.getByTestId('log-burnin-fraction').textContent).toBe('(250/1,001 samples)');
     fireEvent.click(screen.getByTestId('log-import-confirm'));
-    expect(load).toHaveBeenCalledWith(file, 0.25);
+    expect(load).toHaveBeenCalledWith(file, 0.25, 1001);
   });
 
   it('submits from the burn-in field with Enter', async () => {
@@ -119,7 +126,7 @@ describe('LogImportModal', () => {
     const input = await screen.findByTestId('log-import-burnin');
     fireEvent.change(input, { target: { value: '0' } });
     fireEvent.keyDown(input, { key: 'Enter' });
-    expect(load).toHaveBeenCalledWith(file, 0);
+    expect(load).toHaveBeenCalledWith(file, 0, 1001);
   });
 
   it('blocks loading with an invalid burn-in', async () => {
@@ -211,6 +218,74 @@ describe('LogImportModal', () => {
   it('keeps at least one sample for any burn-in below 100%', () => {
     expect(burnInSampleCount(1, 0.99)).toBe(0);
     expect(burnInSampleCount(1000, 0.999)).toBe(999);
+  });
+
+  describe('with a log already loaded', () => {
+    const sourceFile = logFile('loaded.log');
+    const loaded: CurrentLog = {
+      fileName: 'loaded.log',
+      columnNames: BSSVS_INSPECTION.columnNames,
+      rowCount: 901,
+      source: { file: sourceFile, sampleCount: 1001, burnInFraction: 0.1 },
+    };
+
+    it('opens on a summary of the current log', () => {
+      renderModal({ current: loaded });
+      expect(screen.getByRole('dialog', { name: 'BEAST log' })).toBeTruthy();
+      expect(screen.getByTestId('log-summary-file').textContent).toBe('loaded.log');
+      expect(screen.getByTestId('log-summary-samples').textContent).toBe('1,001');
+      expect((screen.getByTestId('log-import-burnin') as HTMLInputElement).value).toBe('10');
+      expect(screen.getByTestId('log-burnin-fraction').textContent).toBe('(100/1,001 samples)');
+      expect(screen.getByTestId('log-summary-bssvs').textContent).toBe('location');
+      expect(screen.queryByTestId('log-drop-target')).toBeNull();
+      expect(document.activeElement).toBe(screen.getByTestId('log-import-cancel'));
+      expect(screen.getByTestId('log-import-cancel').textContent).toBe('Close');
+    });
+
+    it('re-applies a changed burn-in to the same file', async () => {
+      const { load, onClose } = renderModal({ current: loaded });
+      const apply = screen.getByTestId('log-import-apply') as HTMLButtonElement;
+      expect(apply.disabled).toBe(true);
+
+      fireEvent.change(screen.getByTestId('log-import-burnin'), { target: { value: '20' } });
+      expect(apply.disabled).toBe(false);
+      fireEvent.click(apply);
+
+      expect(load).toHaveBeenCalledWith(sourceFile, 0.2, 1001);
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+    });
+
+    it('removes the log', () => {
+      const { onRemove, onClose } = renderModal({ current: loaded });
+      fireEvent.click(screen.getByTestId('log-import-remove'));
+      expect(onRemove).toHaveBeenCalled();
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it('replaces via the file chooser, starting from the default burn-in', async () => {
+      const { load } = renderModal({ current: loaded });
+      fireEvent.change(screen.getByTestId('log-import-burnin'), { target: { value: '30' } });
+      fireEvent.click(screen.getByTestId('log-import-replace'));
+
+      expect(screen.getByTestId('log-drop-target')).toBeTruthy();
+      expect(screen.getByText(/to replace loaded\.log/)).toBeTruthy();
+      const file = logFile('new.log');
+      chooseFile(file);
+      expect(((await screen.findByTestId('log-import-burnin')) as HTMLInputElement).value).toBe(
+        '10',
+      );
+      fireEvent.click(screen.getByTestId('log-import-confirm'));
+      expect(load).toHaveBeenCalledWith(file, 0.1, 1001);
+    });
+
+    it('shows a project-restored log without editable burn-in', () => {
+      renderModal({ current: { ...loaded, source: null } });
+      expect(screen.getByTestId('log-summary-samples').textContent).toBe('901 after burn-in');
+      expect(screen.getByTestId('log-summary-burnin').textContent).toMatch(/before the project/);
+      expect(screen.queryByTestId('log-import-burnin')).toBeNull();
+      expect(screen.queryByTestId('log-import-apply')).toBeNull();
+      expect(screen.getByTestId('log-import-replace')).toBeTruthy();
+    });
   });
 
   it('cancels from the file chooser', () => {

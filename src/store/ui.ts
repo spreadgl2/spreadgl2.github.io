@@ -111,7 +111,7 @@ export interface UiStore {
   layerOpacity: Record<string, number>;
   deselectedValues: Set<string>;
   showLogImport: boolean;
-  dtaMapOverlay: 'none' | 'bf' | 'jumps' | 'rates';
+  dtaMapOverlay: 'none' | 'bf' | 'jumps';
   symmetryMode: SymmetryMode;
   // Minimum Bayes factor for a BSSVS route to show in the table and BF-arrow overlay.
   bssvsBfThreshold: number;
@@ -122,7 +122,7 @@ export interface UiStore {
   hoveredLocationName: string | null;
   setActivePanel: (panel: ActivePanel) => void;
   setShowLogImport: (show: boolean) => void;
-  setDtaMapOverlay: (mode: 'none' | 'bf' | 'jumps' | 'rates') => void;
+  setDtaMapOverlay: (mode: 'none' | 'bf' | 'jumps') => void;
   setSymmetryMode: (mode: SymmetryMode) => void;
   setBssvsBfThreshold: (v: number) => void;
   setPosteriorThreshold: (threshold: number) => void;

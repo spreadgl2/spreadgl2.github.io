@@ -18,7 +18,14 @@ import type {
 import type { ParseStage } from '../workers/parser-pipeline';
 
 export type ParseStatus = 'idle' | 'parsing' | 'done' | 'error';
-export type LogStatus = 'idle' | 'loading' | 'loaded' | 'error';
+
+/** Where a loaded log came from, kept so its burn-in can be re-applied. */
+export interface LogSource {
+  file: File;
+  /** Samples in the file before burn-in. */
+  sampleCount: number;
+  burnInFraction: number;
+}
 
 // Provenance of a discrete location's coordinate, surfaced in the Locations
 // panel so the user can see which coordinates are trustworthy.
@@ -69,8 +76,8 @@ export interface TreeStore {
   choroplethOverlays: ChoroplethOverlay[];
   logTable: LogTable | null;
   logFileName: string | null;
-  logStatus: LogStatus;
-  logError: string | null;
+  /** Null for logs restored from a project file. */
+  logSource: LogSource | null;
   setGraph: (graph: PhyloGraph) => void;
   setLayout: (layout: Layout) => void;
   setBranchTable: (branchTable: BranchTable) => void;
@@ -102,8 +109,8 @@ export interface TreeStore {
   removeCustomOverlay: (id: string) => void;
   clearCustomOverlays: () => void;
   clearChoroplethOverlays: () => void;
-  setLogTable: (table: LogTable, fileName: string) => void;
-  setLogStatus: (status: LogStatus, error?: string) => void;
+  setLogTable: (table: LogTable, fileName: string, source?: LogSource | null) => void;
+  clearLog: () => void;
   reset: () => void;
 }
 
@@ -134,8 +141,7 @@ export const useTreeStore = create<TreeStore>((set) => ({
   choroplethOverlays: [],
   logTable: null,
   logFileName: null,
-  logStatus: 'idle',
-  logError: null,
+  logSource: null,
   setGraph: (graph) => set({ graph }),
   setLayout: (layout) => set({ layout }),
   setBranchTable: (branchTable) =>
@@ -225,9 +231,9 @@ export const useTreeStore = create<TreeStore>((set) => ({
     set((state) => ({ customOverlays: state.customOverlays.filter((o) => o.id !== id) })),
   clearCustomOverlays: () => set({ customOverlays: [] }),
   clearChoroplethOverlays: () => set({ choroplethOverlays: [] }),
-  setLogTable: (table, fileName) =>
-    set({ logTable: table, logFileName: fileName, logStatus: 'loaded', logError: null }),
-  setLogStatus: (logStatus, error) => set({ logStatus, logError: error ?? null }),
+  setLogTable: (table, fileName, source = null) =>
+    set({ logTable: table, logFileName: fileName, logSource: source }),
+  clearLog: () => set({ logTable: null, logFileName: null, logSource: null }),
   reset: () =>
     set({
       graph: null,
@@ -256,7 +262,6 @@ export const useTreeStore = create<TreeStore>((set) => ({
       choroplethOverlays: [],
       logTable: null,
       logFileName: null,
-      logStatus: 'idle',
-      logError: null,
+      logSource: null,
     }),
 }));

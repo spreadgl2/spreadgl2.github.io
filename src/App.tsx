@@ -200,6 +200,10 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
   const showLogImport = useUiStore((s) => s.showLogImport);
   const setShowLogImport = useUiStore((s) => s.setShowLogImport);
   const setLogTable = useTreeStore((s) => s.setLogTable);
+  const clearLog = useTreeStore((s) => s.clearLog);
+  const logTable = useTreeStore((s) => s.logTable);
+  const logFileName = useTreeStore((s) => s.logFileName);
+  const logSource = useTreeStore((s) => s.logSource);
   const colorByKey = useUiStore((s) => s.colorByKey);
   const palette = useUiStore((s) => s.palette);
 
@@ -807,11 +811,11 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
 
   // Errors propagate to the import modal; the loaded log is only replaced on success.
   const loadLogFile = useCallback(
-    async (file: File, burnInFraction: number) => {
+    async (file: File, burnInFraction: number, sampleCount: number) => {
       const api = logApiRef.current;
       if (!api) throw new Error('The log reader is not ready yet.');
       const table = await api.parse(file, { burnInFraction });
-      setLogTable(table, file.name);
+      setLogTable(table, file.name, { file, sampleCount, burnInFraction });
       // If the log carries BSSVS indicators for the tree's discrete trait,
       // surface them straight away: open the Analysis panel on the BSSVS tab.
       const { traitInfo } = useTreeStore.getState();
@@ -869,8 +873,19 @@ export default function App({ autoLoadExampleId, playbackLoopEnabled = true }: A
           {showLogImport && (
             <LogImportModal
               treeStates={traitInfo?.kind === 'discrete' ? traitInfo.values : null}
+              current={
+                logTable && logFileName
+                  ? {
+                      fileName: logFileName,
+                      columnNames: logTable.columnNames,
+                      rowCount: logTable.rowCount,
+                      source: logSource,
+                    }
+                  : null
+              }
               inspect={inspectLogFile}
               load={loadLogFile}
+              onRemove={clearLog}
               onClose={() => setShowLogImport(false)}
             />
           )}

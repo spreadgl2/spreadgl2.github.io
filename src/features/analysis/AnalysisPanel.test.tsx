@@ -574,7 +574,7 @@ describe('AnalysisPanel', () => {
   });
 
   it('shows a BSSVS tab for a discrete tree once a log is loaded', () => {
-    useTreeStore.setState({ logStatus: 'loaded', logTable: bssvsLogTable() });
+    useTreeStore.setState({ logTable: bssvsLogTable() });
     render(<AnalysisPanel />);
     expect(screen.getByTestId('analysis-tab-bssvs').textContent).toBe('BSSVS');
   });
@@ -587,7 +587,6 @@ describe('AnalysisPanel', () => {
         wgs84: true,
       },
       discreteGeoLookup: null,
-      logStatus: 'loaded',
       logTable: bssvsLogTable(),
     });
     render(<AnalysisPanel />);
@@ -595,7 +594,7 @@ describe('AnalysisPanel', () => {
   });
 
   it('switching to the BSSVS tab shows the Bayes factor table with a Prior column', () => {
-    useTreeStore.setState({ logStatus: 'loaded', logTable: bssvsLogTable() });
+    useTreeStore.setState({ logTable: bssvsLogTable() });
     render(<AnalysisPanel />);
 
     fireEvent.click(screen.getByTestId('analysis-tab-bssvs'));
@@ -607,7 +606,7 @@ describe('AnalysisPanel', () => {
   });
 
   it('sorts the BSSVS table when a column header is clicked', () => {
-    useTreeStore.setState({ logStatus: 'loaded', logTable: bssvsLogTable() });
+    useTreeStore.setState({ logTable: bssvsLogTable() });
     render(<AnalysisPanel />);
     fireEvent.click(screen.getByTestId('analysis-tab-bssvs'));
 

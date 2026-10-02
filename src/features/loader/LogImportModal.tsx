@@ -7,24 +7,37 @@ import {
 } from '../../lib/log/log-summary';
 import type { LogInspection } from '../../lib/log/log-table';
 import { assertInputSize } from '../../lib/security/input-limits';
+import type { LogSource } from '../../store/tree';
 import { useModalAccessibility } from '../modal/useModalAccessibility';
 import styles from './ImportModal.module.css';
 import logStyles from './LogImportModal.module.css';
 
+/** The log already loaded, if any. */
+export interface CurrentLog {
+  fileName: string;
+  columnNames: string[];
+  /** Samples kept after burn-in. */
+  rowCount: number;
+  /** Null when the log came from a project file and cannot be re-read. */
+  source: LogSource | null;
+}
+
 interface Props {
   /** The tree's discrete states, or null for a continuous tree. */
   treeStates: string[] | null;
+  current: CurrentLog | null;
   inspect: (file: File) => Promise<LogInspection>;
   /** Parses and stores the log; rejects with a user-facing error. */
-  load: (file: File, burnInFraction: number) => Promise<void>;
+  load: (file: File, burnInFraction: number, sampleCount: number) => Promise<void>;
+  onRemove: () => void;
   onClose: () => void;
 }
 
 type Step =
+  | { kind: 'current' }
   | { kind: 'pick' }
   | { kind: 'inspecting'; file: File }
-  | { kind: 'review'; file: File; inspection: LogInspection; summary: LogContentSummary }
-  | { kind: 'loading'; file: File; inspection: LogInspection; summary: LogContentSummary };
+  | { kind: 'review'; file: File; inspection: LogInspection; summary: LogContentSummary };
 
 function errorMessage(err: unknown, fallback: string): string {
   return err instanceof Error && err.message ? err.message : fallback;
@@ -37,6 +50,10 @@ export function burnInSampleCount(sampleCount: number, burnInFraction: number): 
   return Math.floor(sampleCount * burnInFraction);
 }
 
+function formatPercent(fraction: number): string {
+  return String(Number((fraction * 100).toFixed(6)));
+}
+
 /** Burn-in percentage from user input, or null unless it is in [0, 100). */
 export function parseBurnInPercent(text: string): number | null {
   if (text.trim() === '') return null;
@@ -46,9 +63,7 @@ export function parseBurnInPercent(text: string): number | null {
 
 function contentNotices(summary: LogContentSummary, treeStates: string[] | null): string[] {
   if (!hasLogAnalyses(summary)) {
-    return [
-      'This log has no BSSVS indicators, Markov jump counts or actual rates, so it adds no analyses.',
-    ];
+    return ['This log has no BSSVS indicators or Markov jump counts, so it adds no analyses.'];
   }
   const notices: string[] = [];
   if (summary.bssvsTraits.length > 0 && treeStates === null) {
@@ -61,27 +76,37 @@ function contentNotices(summary: LogContentSummary, treeStates: string[] | null)
   return notices;
 }
 
-export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
-  const [step, setStep] = useState<Step>({ kind: 'pick' });
-  const [burnInText, setBurnInText] = useState(String(DEFAULT_BURN_IN_PERCENT));
+export function LogImportModal({ treeStates, current, inspect, load, onRemove, onClose }: Props) {
+  const [step, setStep] = useState<Step>(() => (current ? { kind: 'current' } : { kind: 'pick' }));
+  const [burnInText, setBurnInText] = useState(() =>
+    current?.source
+      ? formatPercent(current.source.burnInFraction)
+      : String(DEFAULT_BURN_IN_PERCENT),
+  );
   const burnInPercent = parseBurnInPercent(burnInText);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const openFileRef = useRef<HTMLButtonElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const loading = step.kind === 'loading';
 
   const handleEscape = useCallback(() => {
-    if (!loading) onClose();
-  }, [loading, onClose]);
+    if (!busy) onClose();
+  }, [busy, onClose]);
   useModalAccessibility({ dialogRef, initialFocusRef: openFileRef, onEscape: handleEscape });
 
   useEffect(() => {
     if (step.kind === 'review') confirmRef.current?.focus();
     if (step.kind === 'pick') openFileRef.current?.focus();
+    if (step.kind === 'current') closeRef.current?.focus();
   }, [step.kind]);
+
+  // Any burn-in below 100% keeps at least one sample (parseLogText floors the cut).
+  const burnInError =
+    burnInPercent === null ? 'Enter a burn-in of at least 0% and below 100%.' : null;
 
   const handleFile = useCallback(
     (file: File) => {
@@ -114,24 +139,43 @@ export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
     [inspect, treeStates],
   );
 
+  const runLoad = useCallback(
+    (file: File, sampleCount: number) => {
+      if (burnInPercent === null) return;
+      setError(null);
+      setBusy(true);
+      load(file, burnInPercent / 100, sampleCount).then(onClose, (err: unknown) => {
+        setError(errorMessage(err, 'Could not load the log file.'));
+        setBusy(false);
+      });
+    },
+    [burnInPercent, load, onClose],
+  );
+
   const handleConfirm = useCallback(() => {
-    if (step.kind !== 'review' || burnInPercent === null) return;
-    setError(null);
-    setStep({ ...step, kind: 'loading' });
-    load(step.file, burnInPercent / 100).then(onClose, (err: unknown) => {
-      setError(errorMessage(err, 'Could not load the log file.'));
-      setStep({ ...step, kind: 'review' });
-    });
-  }, [burnInPercent, load, onClose, step]);
+    if (busy || step.kind !== 'review') return;
+    runLoad(step.file, step.inspection.sampleCount);
+  }, [busy, runLoad, step]);
 
-  // Any burn-in below 100% keeps at least one sample (parseLogText floors the cut).
-  const reviewBurnInError =
-    burnInPercent === null ? 'Enter a burn-in of at least 0% and below 100%.' : null;
+  const source = current?.source ?? null;
+  const burnInChanged =
+    source !== null && burnInPercent !== null && burnInPercent / 100 !== source.burnInFraction;
 
-  const handleChooseAnother = useCallback(() => {
+  const handleApplyBurnIn = useCallback(() => {
+    if (busy || !source || !burnInChanged) return;
+    runLoad(source.file, source.sampleCount);
+  }, [burnInChanged, busy, runLoad, source]);
+
+  const handleChooseFile = useCallback(() => {
     setError(null);
+    setBurnInText(String(DEFAULT_BURN_IN_PERCENT));
     setStep({ kind: 'pick' });
   }, []);
+
+  const handleRemove = useCallback(() => {
+    onRemove();
+    onClose();
+  }, [onClose, onRemove]);
 
   return (
     <div className={styles.backdrop} data-testid="log-import-backdrop">
@@ -145,14 +189,23 @@ export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
         data-testid="log-import-modal"
       >
         <h2 id="log-import-title" className={styles.title}>
-          Load BEAST log
+          {step.kind === 'current' ? 'BEAST log' : 'Load BEAST log'}
         </h2>
 
         {step.kind === 'pick' && (
           <>
             <p className={styles.body}>
-              Add a BEAST <code>.log</code> file for BSSVS support, Markov jumps and actual
-              migration rates. You can review its contents before loading.
+              {current ? (
+                <>
+                  Choose a BEAST <code>.log</code> file to replace {current.fileName}. The current
+                  log stays loaded until the new one loads.
+                </>
+              ) : (
+                <>
+                  Add a BEAST <code>.log</code> file for BSSVS support and Markov jumps. You can
+                  review its contents before loading.
+                </>
+              )}
             </p>
             <section
               aria-label="Drop zone for BEAST log file"
@@ -205,18 +258,36 @@ export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
           </p>
         )}
 
-        {(step.kind === 'review' || step.kind === 'loading') && (
-          <LogReview
+        {step.kind === 'review' && (
+          <LogSummary
             fileName={step.file.name}
-            inspection={step.inspection}
+            sampleCount={step.inspection.sampleCount}
+            columnCount={step.inspection.columnNames.length}
             summary={step.summary}
-            burnInText={burnInText}
-            burnInPercent={burnInPercent}
-            burnInError={reviewBurnInError}
-            disabled={loading}
-            onBurnInChange={setBurnInText}
-            onSubmit={handleConfirm}
             notices={contentNotices(step.summary, treeStates)}
+            burnIn={{
+              text: burnInText,
+              percent: burnInPercent,
+              error: burnInError,
+              disabled: busy,
+              onChange: setBurnInText,
+              onSubmit: handleConfirm,
+            }}
+          />
+        )}
+
+        {step.kind === 'current' && current && (
+          <CurrentLogSummary
+            current={current}
+            treeStates={treeStates}
+            burnIn={{
+              text: burnInText,
+              percent: burnInPercent,
+              error: burnInError,
+              disabled: busy,
+              onChange: setBurnInText,
+              onSubmit: handleApplyBurnIn,
+            }}
           />
         )}
 
@@ -227,13 +298,46 @@ export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
         )}
 
         <div className={styles.actions}>
-          {(step.kind === 'review' || step.kind === 'loading') && (
+          {step.kind === 'current' && (
             <>
               <button
                 type="button"
                 className={styles.altBtn}
-                onClick={handleChooseAnother}
-                disabled={loading}
+                onClick={handleRemove}
+                disabled={busy}
+                data-testid="log-import-remove"
+              >
+                Remove log
+              </button>
+              <button
+                type="button"
+                className={styles.altBtn}
+                onClick={handleChooseFile}
+                disabled={busy}
+                data-testid="log-import-replace"
+              >
+                Replace…
+              </button>
+              {source && (
+                <button
+                  type="button"
+                  className={styles.confirmBtn}
+                  onClick={handleApplyBurnIn}
+                  disabled={busy || !burnInChanged}
+                  data-testid="log-import-apply"
+                >
+                  {busy ? 'Applying…' : 'Apply burn-in'}
+                </button>
+              )}
+            </>
+          )}
+          {step.kind === 'review' && (
+            <>
+              <button
+                type="button"
+                className={styles.altBtn}
+                onClick={handleChooseFile}
+                disabled={busy}
                 data-testid="log-import-choose-another"
               >
                 Choose another file
@@ -243,21 +347,22 @@ export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
                 type="button"
                 className={styles.confirmBtn}
                 onClick={handleConfirm}
-                disabled={loading || reviewBurnInError !== null}
+                disabled={busy || burnInError !== null}
                 data-testid="log-import-confirm"
               >
-                {loading ? 'Loading…' : 'Load log'}
+                {busy ? 'Loading…' : 'Load log'}
               </button>
             </>
           )}
           <button
+            ref={closeRef}
             type="button"
             className={styles.altBtn}
             onClick={onClose}
-            disabled={loading}
+            disabled={busy}
             data-testid="log-import-cancel"
           >
-            Cancel
+            {step.kind === 'current' ? 'Close' : 'Cancel'}
           </button>
         </div>
       </div>
@@ -265,31 +370,61 @@ export function LogImportModal({ treeStates, inspect, load, onClose }: Props) {
   );
 }
 
-function LogReview({
+interface BurnInField {
+  text: string;
+  percent: number | null;
+  error: string | null;
+  disabled: boolean;
+  onChange: (text: string) => void;
+  onSubmit: () => void;
+}
+
+function CurrentLogSummary({
+  current,
+  treeStates,
+  burnIn,
+}: {
+  current: CurrentLog;
+  treeStates: string[] | null;
+  burnIn: BurnInField;
+}) {
+  const summary = summarizeLogColumns(current.columnNames, treeStates);
+  return (
+    <LogSummary
+      fileName={current.fileName}
+      sampleCount={current.source?.sampleCount ?? null}
+      keptCount={current.rowCount}
+      columnCount={current.columnNames.length}
+      summary={summary}
+      notices={contentNotices(summary, treeStates)}
+      burnIn={current.source ? burnIn : null}
+    />
+  );
+}
+
+function LogSummary({
   fileName,
-  inspection,
+  sampleCount,
+  keptCount,
+  columnCount,
   summary,
-  burnInText,
-  burnInPercent,
-  burnInError,
-  disabled,
-  onBurnInChange,
-  onSubmit,
   notices,
+  burnIn,
 }: {
   fileName: string;
-  inspection: LogInspection;
+  /** Total samples in the file; null when only the post-burn-in count is known. */
+  sampleCount: number | null;
+  keptCount?: number;
+  columnCount: number;
   summary: LogContentSummary;
-  burnInText: string;
-  burnInPercent: number | null;
-  burnInError: string | null;
-  disabled: boolean;
-  onBurnInChange: (text: string) => void;
-  onSubmit: () => void;
   notices: string[];
+  /** Null when burn-in can no longer be changed (log restored from a project). */
+  burnIn: BurnInField | null;
 }) {
   const burned =
-    burnInPercent === null ? null : burnInSampleCount(inspection.sampleCount, burnInPercent / 100);
+    burnIn && burnIn.percent !== null && sampleCount !== null
+      ? burnInSampleCount(sampleCount, burnIn.percent / 100)
+      : null;
   const bssvs =
     summary.matchedBssvsTrait ??
     (summary.bssvsTraits.length > 0 ? summary.bssvsTraits.join(', ') : 'not found');
@@ -299,43 +434,55 @@ function LogReview({
         <SummaryRow label="File" value={fileName} testId="log-summary-file" />
         <SummaryRow
           label="Samples"
-          value={inspection.sampleCount.toLocaleString()}
+          value={
+            sampleCount !== null
+              ? sampleCount.toLocaleString()
+              : `${(keptCount ?? 0).toLocaleString()} after burn-in`
+          }
           testId="log-summary-samples"
         />
-        <div className={styles.summaryRow}>
-          <label className={styles.summaryLabel} htmlFor="log-import-burnin">
-            Burn-in
-          </label>
-          <span className={logStyles.burnInRow}>
-            <input
-              id="log-import-burnin"
-              type="number"
-              inputMode="decimal"
-              min={0}
-              max={99}
-              step="any"
-              className={logStyles.burnInInput}
-              value={burnInText}
-              disabled={disabled}
-              aria-invalid={burnInError !== null}
-              aria-describedby={burnInError ? 'log-import-burnin-error' : undefined}
-              onChange={(e) => onBurnInChange(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') onSubmit();
-              }}
-              data-testid="log-import-burnin"
-            />
-            <span className={logStyles.burnInUnit}>%</span>
-            {burned !== null && (
-              <span className={logStyles.burnInFraction} data-testid="log-burnin-fraction">
-                ({burned.toLocaleString()}/{inspection.sampleCount.toLocaleString()} samples)
-              </span>
-            )}
-          </span>
-        </div>
+        {burnIn ? (
+          <div className={styles.summaryRow}>
+            <label className={styles.summaryLabel} htmlFor="log-import-burnin">
+              Burn-in
+            </label>
+            <span className={logStyles.burnInRow}>
+              <input
+                id="log-import-burnin"
+                type="number"
+                inputMode="decimal"
+                min={0}
+                max={99}
+                step="any"
+                className={logStyles.burnInInput}
+                value={burnIn.text}
+                disabled={burnIn.disabled}
+                aria-invalid={burnIn.error !== null}
+                aria-describedby={burnIn.error ? 'log-import-burnin-error' : undefined}
+                onChange={(e) => burnIn.onChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') burnIn.onSubmit();
+                }}
+                data-testid="log-import-burnin"
+              />
+              <span className={logStyles.burnInUnit}>%</span>
+              {burned !== null && sampleCount !== null && (
+                <span className={logStyles.burnInFraction} data-testid="log-burnin-fraction">
+                  ({burned.toLocaleString()}/{sampleCount.toLocaleString()} samples)
+                </span>
+              )}
+            </span>
+          </div>
+        ) : (
+          <SummaryRow
+            label="Burn-in"
+            value="applied before the project was saved"
+            testId="log-summary-burnin"
+          />
+        )}
         <SummaryRow
           label="Columns"
-          value={inspection.columnNames.length.toLocaleString()}
+          value={columnCount.toLocaleString()}
           testId="log-summary-columns"
         />
         <SummaryRow label="BSSVS" value={bssvs} testId="log-summary-bssvs" />
@@ -344,20 +491,15 @@ function LogReview({
           value={summary.markovJumpTrait ?? 'not found'}
           testId="log-summary-jumps"
         />
-        <SummaryRow
-          label="Actual rates"
-          value={summary.actualRatesTrait ?? 'not found'}
-          testId="log-summary-rates"
-        />
       </div>
-      {burnInError && (
+      {burnIn?.error && (
         <p
           id="log-import-burnin-error"
           className={styles.errorText}
           role="alert"
           data-testid="log-import-burnin-error"
         >
-          {burnInError}
+          {burnIn.error}
         </p>
       )}
       {notices.map((notice) => (

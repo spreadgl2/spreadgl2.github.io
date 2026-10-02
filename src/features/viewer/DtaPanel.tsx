@@ -76,10 +76,10 @@ export function DtaPanel() {
       ? inferBssvsSymmetryMode(logTable.columnNames, activeStates)
       : null;
 
-  // Clear jumps/rates overlays (retained in the store for future use), and force
+  // Clear the jumps overlay (retained in the store for future use), and force
   // the overlay off whenever the active trait can't be drawn on the map.
   useEffect(() => {
-    if (dtaMapOverlay === 'jumps' || dtaMapOverlay === 'rates') setDtaMapOverlay('none');
+    if (dtaMapOverlay === 'jumps') setDtaMapOverlay('none');
     else if (!hasCoords && dtaMapOverlay !== 'none') setDtaMapOverlay('none');
   }, [dtaMapOverlay, hasCoords, setDtaMapOverlay]);
 

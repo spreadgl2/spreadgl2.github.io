@@ -18,7 +18,6 @@ import { getPaletteColor, suggestPaletteForVariable } from '../../lib/env/palett
 import { choroplethColorScale, joinChoropleth } from '../../lib/format/choropleth-join';
 import { decimalYearToISO } from '../../lib/format/decimal-year';
 import type { HpdPolygonRenderDatum } from '../../lib/geo/hpd-render-data';
-import { computeActualRates } from '../../lib/log/actual-rates';
 import { bfColor } from '../../lib/log/bf-color';
 import { computeBssvsBayesFactors } from '../../lib/log/bssvs';
 import { computeJumpMatrix } from '../../lib/log/markov-jumps';
@@ -1481,42 +1480,6 @@ export function useMapDeckModel() {
     return assignArcStacks(result);
   }, [dtaMapOverlay, logTable, discreteGeoLookup]);
 
-  // Effective transition rate arc overlay — width ∝ mean rate.
-  const ratesArcData = useMemo((): BfArcDatum[] => {
-    if (
-      dtaMapOverlay !== 'rates' ||
-      !logTable ||
-      traitInfo?.kind !== 'discrete' ||
-      !discreteGeoLookup
-    )
-      return [];
-    const stateList = [...traitInfo.values].sort();
-    const matrix = computeActualRates(logTable, stateList, symmetryMode);
-    if (!matrix) return [];
-    let maxRate = 0;
-    for (const r of matrix.routes) {
-      if (r.meanRate > maxRate) maxRate = r.meanRate;
-    }
-    const result: BfArcDatum[] = [];
-    for (const r of matrix.routes) {
-      if (r.meanRate <= 0) continue;
-      const srcCoord = discreteGeoLookup.get(r.from);
-      const tgtCoord = discreteGeoLookup.get(r.to);
-      if (!srcCoord || !tgtCoord) continue;
-      const t = maxRate > 0 ? r.meanRate / maxRate : 1;
-      const widthPixels = 1 + t * 8;
-      result.push({
-        sourcePosition: [srcCoord[1], srcCoord[0]],
-        targetPosition: [tgtCoord[1], tgtCoord[0]],
-        widthPixels,
-        color: [200, 200, 200],
-        stackIndex: 0,
-        stackCount: 1,
-      });
-    }
-    return assignArcStacks(result);
-  }, [dtaMapOverlay, logTable, traitInfo, discreteGeoLookup, symmetryMode]);
-
   const timeFilterDomain = useMemo((): TimeFilterDomain => {
     if (!branchTable) return { min: -1, max: 1 };
     return buildTimeFilterDomain(bounds, branchTable);
@@ -1878,29 +1841,6 @@ export function useMapDeckModel() {
       );
     }
 
-    if (ratesArcData.length > 0) {
-      result.push(
-        new ArcLayer<BfArcDatum>({
-          id: 'actual-rates-arcs',
-          data: ratesArcData,
-          getSourcePosition: (d) => d.sourcePosition,
-          getTargetPosition: (d) => d.targetPosition,
-          getSourceColor: [140, 255, 160, 180],
-          getTargetColor: [140, 255, 160, 180],
-          getWidth: (d) => d.widthPixels,
-          widthUnits: 'pixels',
-          widthMinPixels: 1,
-          getHeight: routeArcHeight,
-          opacity: 1,
-          pickable: false,
-          updateTriggers: {
-            getWidth: ratesArcData,
-            getHeight: ratesArcData,
-          },
-        }),
-      );
-    }
-
     if (
       clusterData &&
       clusterData.length > 0 &&
@@ -2009,7 +1949,6 @@ export function useMapDeckModel() {
     bfArcData,
     bfLocationData,
     jumpArcData,
-    ratesArcData,
     clusterData,
     clusterUniverse,
     layerVisibility,

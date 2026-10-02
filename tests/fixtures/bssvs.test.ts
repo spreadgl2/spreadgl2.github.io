@@ -266,3 +266,60 @@ describe('route mapping — ordering invariant', () => {
     expect(rows.find((r) => r.indicatorIdx === 2)?.to).toBe('C');
   });
 });
+
+describe('indicator names with or without a dot (location.indicators.1 / location.indicators1)', () => {
+  const dotted = parseLogText(readFileSync(TINY_PATH, 'utf-8'), { burnInFraction: 0 });
+  // Same columns and numbers, without the dot before the index.
+  const undotted: LogTable = {
+    ...dotted,
+    columnNames: dotted.columnNames.map((name) => name.replace(/\.indicators\.(\d+)$/, '.indicators$1')),
+  };
+  const states = ['A', 'B', 'C'];
+
+  it('renames the fixture as intended', () => {
+    expect(undotted.columnNames).toContain('location.indicators0');
+    expect(undotted.columnNames).not.toContain('location.indicators.0');
+  });
+
+  it('detects the trait from either naming', () => {
+    expect(detectTraitName(['state', 'location.indicators1'])).toBe('location');
+    expect(detectTraitNames(['location.indicators1', 'host.indicators.0'])).toEqual([
+      'location',
+      'host',
+    ]);
+    expect(detectTraitNameForStates(undotted.columnNames, states)).toBe('location');
+  });
+
+  it('reads the same index with or without the dot', () => {
+    const dottedCols = getIndicatorColumns(['location.indicators.2', 'location.indicators.1'], 'location');
+    const undottedCols = getIndicatorColumns(['location.indicators2', 'location.indicators1'], 'location');
+    expect(dottedCols.map((c) => c.idx)).toEqual([1, 2]);
+    expect(undottedCols.map((c) => c.idx)).toEqual([1, 2]);
+  });
+
+  it('infers the symmetry mode from dot-less indicators', () => {
+    const cols = ['location.indicators0', 'location.indicators1', 'location.indicators2'];
+    expect(inferBssvsSymmetryMode(cols, states)).toBe('symmetric');
+  });
+
+  it('gives the same Bayes factors as the dotted naming', () => {
+    const strip = (rows: ReturnType<typeof computeBssvsBayesFactors>) =>
+      rows.map(({ from, to, posteriorFrequency, bayesFactor, indicatorIdx }) => ({
+        from,
+        to,
+        posteriorFrequency,
+        bayesFactor,
+        indicatorIdx,
+      }));
+    expect(strip(computeBssvsBayesFactors(undotted, states, 'symmetric'))).toEqual(
+      strip(computeBssvsBayesFactors(dotted, states, 'symmetric')),
+    );
+  });
+
+  it('does not treat other traits or malformed routes as indicators', () => {
+    const cols = ['location.indicators1', 'host.indicators1', 'location.indicators.A.B.C'];
+    expect(getIndicatorColumns(cols, 'location').map((c) => c.name)).toEqual([
+      'location.indicators1',
+    ]);
+  });
+});

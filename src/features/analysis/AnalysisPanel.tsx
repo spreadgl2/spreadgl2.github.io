@@ -736,7 +736,7 @@ export function AnalysisPanel({ fill = false }: AnalysisPanelProps) {
   const graph = useTreeStore((s) => s.graph);
   const layout = useTreeStore((s) => s.layout);
   const traitInfo = useTreeStore((s) => s.traitInfo);
-  const logStatus = useTreeStore((s) => s.logStatus);
+  const hasLog = useTreeStore((s) => s.logTable !== null);
   const discreteGeoLookup = useTreeStore((s) => s.discreteGeoLookup);
   const bounds = useTimelineStore((s) => s.bounds);
   const playhead = useTimelineStore((s) =>
@@ -814,7 +814,7 @@ export function AnalysisPanel({ fill = false }: AnalysisPanelProps) {
   }, [traitInfo, discreteGeoLookup]);
   const hasTransitionsTab = traitInfo?.kind === 'discrete';
   // BSSVS Bayes factors need a discrete trait AND a loaded BEAST log.
-  const hasBssvsTab = traitInfo?.kind === 'discrete' && logStatus === 'loaded';
+  const hasBssvsTab = traitInfo?.kind === 'discrete' && hasLog;
   const transitionTraitKey = traitInfo?.kind === 'discrete' ? traitInfo.key : null;
   const transitionValues = useMemo(
     () => (traitInfo?.kind === 'discrete' ? traitInfo.values : []),

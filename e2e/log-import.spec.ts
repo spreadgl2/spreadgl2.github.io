@@ -41,4 +41,19 @@ test('BEAST log is reviewed in the import modal before loading', async ({ page }
   await page.locator('[data-testid="log-import-confirm"]').click();
   await expect(dialog).toBeHidden();
   await expect(page.locator('[data-testid="sidebar-log-row"]')).toContainText('bssvs-tiny.log');
+
+  // Reopening shows the loaded log; burn-in can be re-applied, and the log removed.
+  await page.locator('[data-testid="sidebar-log-row"]').click();
+  const loadedDialog = page.getByRole('dialog', { name: 'BEAST log' });
+  await expect(loadedDialog).toBeVisible();
+  await expect(page.locator('[data-testid="log-import-burnin"]')).toHaveValue('25');
+  await page.locator('[data-testid="log-import-burnin"]').fill('50');
+  await page.locator('[data-testid="log-import-apply"]').click();
+  await expect(loadedDialog).toBeHidden();
+
+  await page.locator('[data-testid="sidebar-log-row"]').click();
+  await expect(page.locator('[data-testid="log-burnin-fraction"]')).toHaveText('(50/100 samples)');
+  await page.locator('[data-testid="log-import-remove"]').click();
+  await expect(loadedDialog).toBeHidden();
+  await expect(page.locator('[data-testid="sidebar-log-row"]')).toContainText('optional');
 });

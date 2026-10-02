@@ -37,10 +37,30 @@ function computeBayesFactor(pPost: number, pPrior: number): number {
   return oddsPost / oddsPrior;
 }
 
+// A BSSVS indicator column: `<trait>.indicators` followed by either a numeric
+// index, with or without a separating dot (`location.indicators.0`,
+// `location.indicators1`), or a named route of two dot-free states
+// (`location.indicators.Arizona.California`).
+const INDICATOR_COLUMN = /^(.+)\.indicators(?:\.?(\d+)|\.([^.]+)\.([^.]+))$/;
+
+interface IndicatorColumnMatch {
+  traitName: string;
+  index?: number;
+  route?: { from: string; to: string };
+}
+
+function matchIndicatorColumn(name: string): IndicatorColumnMatch | null {
+  const m = INDICATOR_COLUMN.exec(name);
+  if (!m?.[1]) return null;
+  if (m[2] !== undefined) return { traitName: m[1], index: Number(m[2]) };
+  if (m[3] && m[4]) return { traitName: m[1], route: { from: m[3], to: m[4] } };
+  return null;
+}
+
 export function detectTraitName(columnNames: string[]): string | null {
   for (const name of columnNames) {
-    const m = /^(.+)\.indicators\.(?:\d+|[^.]+\.[^.]+)$/.exec(name);
-    if (m?.[1]) return m[1];
+    const match = matchIndicatorColumn(name);
+    if (match) return match.traitName;
   }
   return null;
 }
@@ -48,8 +68,8 @@ export function detectTraitName(columnNames: string[]): string | null {
 export function detectTraitNames(columnNames: string[]): string[] {
   const seen = new Set<string>();
   for (const name of columnNames) {
-    const m = /^(.+)\.indicators\.(?:\d+|[^.]+\.[^.]+)$/.exec(name);
-    if (m?.[1]) seen.add(m[1]);
+    const match = matchIndicatorColumn(name);
+    if (match) seen.add(match.traitName);
   }
   return [...seen];
 }
@@ -77,7 +97,6 @@ export function getIndicatorColumns(
   columnNames: string[],
   traitName: string,
 ): { name: string; idx: number; colIdx: number; route?: { from: string; to: string } }[] {
-  const prefix = `${traitName}.indicators.`;
   const results: {
     name: string;
     idx: number;
@@ -86,25 +105,14 @@ export function getIndicatorColumns(
   }[] = [];
   for (let colIdx = 0; colIdx < columnNames.length; colIdx++) {
     const name = columnNames[colIdx];
-    if (!name?.startsWith(prefix)) continue;
-    const idxStr = name.slice(prefix.length);
-    const idx = Number(idxStr);
-    if (Number.isInteger(idx) && idx >= 0) {
-      results.push({ name, idx, colIdx });
-      continue;
-    }
-    // Named route, e.g. state.indicators.Arizona.California → from/to on the
-    // first dot. Limitation: state names containing '.' (e.g. "St. Louis") are
-    // not supported — the detectTraitName regex requires exactly two dot-free
-    // tokens and this split would break from/to. Rare for BEAST discrete states.
-    const dotIdx = idxStr.indexOf('.');
-    if (dotIdx > 0 && dotIdx < idxStr.length - 1) {
-      results.push({
-        name,
-        idx: results.length,
-        colIdx,
-        route: { from: idxStr.slice(0, dotIdx), to: idxStr.slice(dotIdx + 1) },
-      });
+    const match = name === undefined ? null : matchIndicatorColumn(name);
+    if (!name || !match || match.traitName !== traitName) continue;
+    if (match.index !== undefined) {
+      results.push({ name, idx: match.index, colIdx });
+    } else if (match.route) {
+      // Limitation: state names containing '.' (e.g. "St. Louis") are not
+      // supported, since the route must split into exactly two names.
+      results.push({ name, idx: results.length, colIdx, route: match.route });
     }
   }
   results.sort((a, b) => a.idx - b.idx);

@@ -45,11 +45,9 @@ describe('summarizeLogColumns', () => {
     expect(summarizeLogColumns(columnNames, null).matchedBssvsTrait).toBeNull();
   });
 
-  it('detects Markov jumps and actual rates', () => {
+  it('detects Markov jumps', () => {
     const jumps = inspectLogText(fixture('markov-jumps-tiny.log')).columnNames;
-    const rates = inspectLogText(fixture('actual-rates-tiny.log')).columnNames;
     expect(summarizeLogColumns(jumps, null).markovJumpTrait).toBe('location');
-    expect(summarizeLogColumns(rates, null).actualRatesTrait).toBe('location');
   });
 
   it('reports logs that offer no analyses', () => {

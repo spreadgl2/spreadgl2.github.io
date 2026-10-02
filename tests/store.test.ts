@@ -349,3 +349,30 @@ describe('removeCustomOverlay', () => {
     expect(useTreeStore.getState().customOverlays.map((o) => o.id)).toEqual(['a', 'c']);
   });
 });
+
+describe('log state', () => {
+  const table = { columnNames: ['state'], columns: [new Float64Array([1])], rowCount: 1 };
+
+  it('records the source a log was loaded from, and clears it', () => {
+    const file = new File(['state\n1\n'], 'run.log');
+    const source = { file, sampleCount: 2, burnInFraction: 0.5 };
+    useTreeStore.getState().setLogTable(table, 'run.log', source);
+    expect(useTreeStore.getState()).toMatchObject({
+      logTable: table,
+      logFileName: 'run.log',
+      logSource: source,
+    });
+
+    useTreeStore.getState().clearLog();
+    expect(useTreeStore.getState()).toMatchObject({
+      logTable: null,
+      logFileName: null,
+      logSource: null,
+    });
+  });
+
+  it('has no source for logs restored without one', () => {
+    useTreeStore.getState().setLogTable(table, 'project.log');
+    expect(useTreeStore.getState().logSource).toBeNull();
+  });
+});

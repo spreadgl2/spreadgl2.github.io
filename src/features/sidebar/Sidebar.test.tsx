@@ -1194,4 +1194,26 @@ describe('Sidebar', () => {
       expect(deselected.has('dog')).toBe(true);
     });
   });
+
+  it('shows a gear on the Log row only when a log is loaded', () => {
+    useTreeStore.setState({
+      graph: MOCK_GRAPH,
+      layout: MOCK_LAYOUT,
+      fileName: 'rabv.tree',
+      logTable: null,
+      logFileName: null,
+    });
+    const { unmount } = render(<Sidebar />);
+    expect(screen.queryByTestId('sidebar-log-settings-icon')).toBeNull();
+    expect(screen.getByTestId('sidebar-log-row').textContent).toContain('optional');
+    unmount();
+
+    useTreeStore.setState({
+      logTable: { columnNames: ['state'], columns: [new Float64Array([1])], rowCount: 1 },
+      logFileName: 'run.log',
+    });
+    render(<Sidebar />);
+    expect(screen.getByTestId('sidebar-log-settings-icon')).toBeTruthy();
+    expect(screen.getByTestId('sidebar-log-row').textContent).toContain('run.log');
+  });
 });

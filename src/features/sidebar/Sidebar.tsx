@@ -1,4 +1,4 @@
-import { CalendarDays, Database, GitBranch, MapPin, Palette } from 'lucide-react';
+import { CalendarDays, Database, GitBranch, MapPin, Palette, Settings } from 'lucide-react';
 import { type ReactNode, useMemo, useState } from 'react';
 import { decimalYearToISO } from '../../lib/format/decimal-year';
 import { buildGlyphByValue } from '../../lib/glyph-map';
@@ -12,8 +12,6 @@ import { useTimelineStore } from '../../store/timeline';
 import { type GeoSource, useTreeStore } from '../../store/tree';
 import { useUiStore } from '../../store/ui';
 import styles from './Sidebar.module.css';
-
-type LogStatus = import('../../store/tree').LogStatus;
 
 const GRADIENT_STOPS = 24;
 
@@ -119,32 +117,6 @@ function GlyphLegend({ glyphByKey, graph }: GlyphLegendProps) {
   );
 }
 
-function logStatusClass(status: LogStatus): string {
-  switch (status) {
-    case 'loaded':
-      return styles.dataIconLoaded ?? '';
-    case 'loading':
-      return styles.dataIconEmpty ?? '';
-    case 'error':
-      return styles.dataIconWarn ?? '';
-    default:
-      return styles.dataIconEmpty ?? '';
-  }
-}
-
-function logStatusLabel(status: LogStatus, fileName: string | null): string {
-  switch (status) {
-    case 'loaded':
-      return fileName ?? 'loaded';
-    case 'loading':
-      return 'loading…';
-    case 'error':
-      return 'error';
-    default:
-      return 'optional';
-  }
-}
-
 interface SidebarProps {
   onReplaceFile?: () => void;
 }
@@ -169,7 +141,7 @@ export function Sidebar({ onReplaceFile }: SidebarProps) {
   // Every loaded map overlay: boundary GeoJSONs + region choropleths + a raster.
   const loadedLayerCount = customOverlays.length + choroplethOverlays.length + (raster ? 1 : 0);
   const allDiscreteKeys = useTreeStore((s) => s.allDiscreteKeys);
-  const logStatus = useTreeStore((s) => s.logStatus);
+  const logLoaded = useTreeStore((s) => s.logTable !== null);
   const logFileName = useTreeStore((s) => s.logFileName);
   const colorByTrait = useUiStore((s) => s.colorByKey);
   const glyphByKey = useUiStore((s) => s.glyphByKey);
@@ -525,22 +497,32 @@ export function Sidebar({ onReplaceFile }: SidebarProps) {
               type="button"
               className={[
                 styles.dataItem,
-                logStatus === 'loaded' ? styles.dataItemLoaded : styles.dataItemEmpty,
+                logLoaded ? styles.dataItemLoaded : styles.dataItemEmpty,
                 styles.dataItemBtn,
               ].join(' ')}
               data-testid="sidebar-log-row"
-              title={logStatus === 'loaded' ? 'BEAST log file loaded' : 'Load a BEAST .log file'}
+              title={
+                logLoaded ? 'Review, replace or remove the BEAST log' : 'Load a BEAST .log file'
+              }
               onClick={() => setShowLogImport(true)}
             >
-              <span className={[styles.dataIcon, logStatusClass(logStatus)].join(' ')} />
-              <span className={styles.dataLabel}>Log</span>
               <span
                 className={[
-                  styles.dataValue,
-                  logStatus === 'error' ? styles.dataValueWarn : '',
+                  styles.dataIcon,
+                  logLoaded ? styles.dataIconLoaded : styles.dataIconEmpty,
                 ].join(' ')}
-              >
-                {logStatusLabel(logStatus, logFileName)}
+              />
+              <span className={styles.dataLabel}>Log</span>
+              {logLoaded && (
+                <Settings
+                  className={styles.dataPin}
+                  size={13}
+                  aria-hidden="true"
+                  data-testid="sidebar-log-settings-icon"
+                />
+              )}
+              <span className={styles.dataValue}>
+                {logLoaded ? (logFileName ?? 'loaded') : 'optional'}
               </span>
             </button>
 
