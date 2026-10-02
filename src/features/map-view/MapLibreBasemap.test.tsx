@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MapLibreBasemap } from './MapLibreBasemap';
 
 const mapLibreState = vi.hoisted(() => ({
   setWorkerUrl: vi.fn(),
@@ -20,7 +19,9 @@ afterEach(() => {
 });
 
 describe('MapLibreBasemap', () => {
-  it('configures the emitted MapLibre worker and renders the map', () => {
+  it('configures the emitted MapLibre worker and renders the map', async () => {
+    // setWorkerUrl runs at module load; import here so the call survives per-test mock clearing.
+    const { MapLibreBasemap } = await import('./MapLibreBasemap');
     render(
       <MapLibreBasemap
         mapRef={{ current: null }}
