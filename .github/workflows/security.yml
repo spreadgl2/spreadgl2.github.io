@@ -7,6 +7,7 @@ on:
       - pnpm-lock.yaml
       - src-tauri/Cargo.toml
       - src-tauri/Cargo.lock
+      - src-tauri/.cargo/audit.toml
       - .github/workflows/security.yml
   push:
     branches: [main]
@@ -15,6 +16,7 @@ on:
       - pnpm-lock.yaml
       - src-tauri/Cargo.toml
       - src-tauri/Cargo.lock
+      - src-tauri/.cargo/audit.toml
       - .github/workflows/security.yml
   schedule:
     - cron: '31 4 * * 1'
