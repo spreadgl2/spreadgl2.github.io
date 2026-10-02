@@ -49,3 +49,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: src-tauri
+          # Accepted upstream risk: both arrive only through Tauri 2's Linux GTK3
+          # stack (tauri -> muda/tao/wry -> gtk 0.18 -> glib 0.18). Remove once
+          # Tauri adopts gtk-rs >= 0.20 (expected with Tauri 3).
+          # RUSTSEC-2024-0429: glib VariantStrIter unsoundness; never called here.
+          # RUSTSEC-2024-0370: proc-macro-error unmaintained; build-time only.
+          ignore: RUSTSEC-2024-0429,RUSTSEC-2024-0370
